@@ -188,6 +188,7 @@ The badge may have the following fields:
 
 * `name` {string} name of the badge, when empty a default language string is used.
 * `description` {string} description of the badge, when empty a default language string is used.
+* `badgedisable` {any} if set, then the badge is not automatically enabled.
 
 If a criteria is set for the badge, the following fields are needed:
 

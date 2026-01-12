@@ -83,7 +83,10 @@ class badge extends modcreate {
             // Add criteria if specified in the current row.
             $this->addCriteria();
         }
-
+        if (!\array_key_exists('badgedisable', $this->row)) {
+            // Enable the badge.
+            $this->badge->set_status(BADGE_STATUS_ACTIVE);
+        }
         return $this;
     }
 
