@@ -1,16 +1,23 @@
-## Generate attendance courses
+# Moodle Plugin Attendance Course Creator
 
 The use case for this plugin is to have automatically set up a course
 to check the student attendance by having them answer one question
 in a test activity to check for the students precense in the course.
 
-Unfortunately, the tracking cannot be done in the course directly that
+The plugin was developed in a generic matter, so that different
+activities can be created with it and that other use cases are possible
+as well not just the "attendance check" use case only.
+
+## Generate attendance courses
+
+The idea of automatically track attendance of a course is done via a specific
+Moodle course. The tracking is not done in the course directly that
 is used for teaching, because the completion tracking depends on the
 presence only and not of the assessements that a student must fulfill.
 Therefore, to track the attendance of a course, a parallel Moodle course
 is required that only tracks the presence and awards the studend a badge
-upon successful course comletion (e.g. when a certain threshold of presence
-items is tracked). This is done by presenting the students a simple
+upon successful course completion (e.g. when a certain threshold of presence
+items is reached). This is done by presenting the students a simple
 quiz with one question that they must answer successfully so that their
 presence is counted. The quiz is open for the course presence time only
 and is password protected.
@@ -18,7 +25,7 @@ and is password protected.
 The plugin offers an upload form so that managers can prepare an import
 file with the course data to automatically create such courses.
 
-### Import file format
+## Import file format
 
 The file format for creating one or more such presence check courses
 with the presence dates is like a CSV but with some extra handling.
@@ -28,66 +35,33 @@ which can be:
 
 * COURSE_COLUMNS
 * MODULE_COLUMNS
+* BADGE_COLUMNS
 * COURSE
 * MODULE
 * USE_COURSE
+* BADGE
 
-The first two commands `*_COLUMNS` define the field names of the following
-`COURSE` and `MODULE` commands.
+The first commands `*_COLUMNS` define the field names of the following
+`COURSE`, `MODULE` and `BADGE` commands. The subsequent commands do perform
+an action (e.g. creating a course, a module or a badge).
 
-The `USE_COURSE` command can be used instead if the `COURSE` command.
-In this case, the defined existing course is used to create the activities in,
-without creating a new course itself.
-
-Valid course columns are:
-* `name` <string> name of the course (can be empty, then a generic name will be used based
-on the source course).
-* `shortname` <string> short name of the course (can be empty, then a suffix will
-be attached to the short name of the source course).
-* `source_course_id` <int> id of the source course, if not set then `source_course_short`
-must be set.
-* `source_course_short` <string> short name of the source course, if not set then
-`source_course_id` must be set.
-* `category` <int> category id where the attendance course is created in. If empty
-the category of the source course is used.
-* `visible` <0|1>  if not provided use the same as the source course.
-* `format` <string> if not provided use the same as the source course.
-* `startdate` <int|datetime> timestamp or parsable date string, if not provided use
-the same as the source course.
-* `enddate` <int|datetime> timestamp or parsable date string, if not provided use
-the same as the source course.
-* `nopaerticipants` <any> when set, the participants from the source course will not
-be enroled in the new course.
-
-Valid module columns are:
-* `module` <string> technical name of the module, e.g. quiz, assign, page etc.
-For the special use case of an attendance quiz use `local_attendance_quiz`. For
-own implementations, you may use "frankenstyle_plugin_someclass". This will try
-to load a class `\frankenstyle_plugin\mod\someclass` which must implement the interface
-`\local_attencance\modcreate`.
-* `section` <int> section identified number where to add the activity. If not set, 1 is used.
-* `sectionid` <int> section identified by id where to add the activity. If not set `section` is used.
-* `name` <string> name of the activity.
-* `timeopen` <datetime> parsable date time string for the time when the test opens.
-* `timeclose` <datetime> parsable date time string for the closing time when the test finishes.
-* `quizpassword` <string> set a specific password to enter the quiz. If not set, a password
-is created automatically (see below). If set but empty, then no access password is used.
-* `attempts` <int> the number of attempts, default is 1.
-* `timelimit` <int> the number of seconds how long the quiz might be answered, default is 60.
-
-A sample file could look like this:
+A very simple exsample file could look like this:
 
 ```
 COURSE_COLUMNS;fullname;source_course_id
-MODULE_COLUMNS;module;name;timeopen;timeclose
-COURSE;Test attendance;23
-MODULE;local_attendance_quiz;Day 1 Attendance;2026-01-06 10:30:00;2026-01-06 10:40:00
+MODULE_COLUMNS;module;name;timeopen;timeclose;local_attendance_quiz_questionname;local_attendance_quiz_questiontext
+BADGE_COLUMNS;criteriatype;grade
+COURSE;Test attendance;10
+MODULE;local_attendance_quiz;Day 1 Attendance;2026-01-06 10:30:00;2026-01-06 10:40:00;Attendance;I was here.
+MODULE;local_attendance_quiz;Day 2 Attendance;2026-01-23 10:30:00;2026-01-23 10:40:00;Attendance;I was <strong>here</strong>.
+BADGE;BADGE_CRITERIA_TYPE_COURSE;2
 ```
 
-### New course
+## New course
 
-Because of the attendance course that must be created in parallel to the teaching course,
-a new course is created via the command `COURSE` in the import file. The `COURSE`
+To create a new activity, a course is needed first. The use case assumes that you have a
+course and want to add attendance tracking. This cannot be done in the same course, but in parallel to the teaching course.
+Therefore, a new course is created via the command `COURSE` in the import file. The `COURSE`
 command accepts one of `source_course_id` for the course id or `source_couse_short` for
 the short name of the course that serves as the teaching course. The attendance course
 is setup based on the teaching source course. However, some fields can be set in the
@@ -96,6 +70,53 @@ details.
 The basic fields like start and endtime and category are taken from the source course
 when not explicitly set in the import file. Also, all course participants from the source
 course will be also enroled in the new course.
+
+The `USE_COURSE` command can be used instead if the `COURSE` command.
+In this case, the defined existing course is used to create the activities in,
+without creating a new course itself.
+
+Valid course columns are:
+* `name` {string} name of the course (can be empty, then a generic name will be used based
+on the source course).
+* `shortname` {string} short name of the course (can be empty, then a suffix will
+be attached to the short name of the source course).
+* `source_course_id` {int} id of the source course, if not set then `source_course_short`
+must be set.
+* `source_course_short` {string} short name of the source course, if not set then
+`source_course_id` must be set.
+* `category` {int} category id where the attendance course is created in. If empty
+the category of the source course is used.
+* `visible` {0|1}  if not provided use the same as the source course.
+* `format` {string} if not provided use the same as the source course.
+* `startdate` {int|datetime} timestamp or parsable date string, if not provided use
+the same as the source course.
+* `enddate` {int|datetime} timestamp or parsable date string, if not provided use
+the same as the source course.
+* `nopaerticipants` {any} when set, the participants from the source course will not
+be enroled in the new course.
+
+## New module
+
+Valid module columns are:
+* `module` {string} technical name of the module, e.g. quiz, assign, page etc.
+For the special use case of an attendance quiz use `local_attendance_quiz`. For
+own implementations, you may use "frankenstyle_plugin_someclass". This will try
+to load a class `\frankenstyle_plugin\mod\someclass` which must implement the interface
+`\local_attencance\modcreate`.
+
+* `section` {int} section identified number where to add the activity. If not set, 1 is used.
+* `sectionid` {int} section identified by id where to add the activity. If not set `section` is used.
+* `name` {string} name of the activity.
+* `timeopen` {datetime} parsable date time string for the time when the activity opens.
+* `timeclose` {datetime} parsable date time string for the closing time when the activity finishes.
+
+Apart from these basic columns, there are many other activity specific columns that can be used
+to setup the activity. For a quiz this would be:
+
+* `quizpassword` {string} set a specific password to enter the quiz. If not set, a password
+is created automatically (see below). If set but empty, then no access password is used.
+* `attempts` {int} the number of attempts, default is 1.
+* `timelimit` {int} the number of seconds how long the quiz might be answered, default is 60.
 
 ### Columns for attentance courses
 
@@ -151,3 +172,51 @@ All these lists are in lower case letters.
 A password can also be set directly in the csv import file. In this case use the column name
 `quizpassword`. That is an official field from the quiz module and therefore uses no prefix.
 If you wish no password set for the quiz, use this field but do no set a value.
+
+## Badge
+
+Badges are awarded by completing a specific condition or when the trainer awards them manually.
+
+For the use case of the attendance tracking we need a badge awarded to the student when
+the quizzes in the attendance course were successfully taken. Therefore, the badge contains
+a condition that the minimum grade is reached. In our case we have to presence dates where
+the students get to answer a quiz with one question each that allows to get a credit of 1
+point. To award a badge the students must be present on both days, answer the quiz correctly
+and receive in total two points hence, meet the condition so that the badge is awarded to them.
+
+The badge may have the following fields:
+
+* `name` {string} name of the badge, when empty a default language string is used.
+* `description` {string} description of the badge, when empty a default language string is used.
+
+If a criteria is set for the badge, the following fields are needed:
+
+* `criteriatype` {string|int} name or value of the criteria constants which are:
+** BADGE_CRITERIA_TYPE_ACTIVITY = 1
+** BADGE_CRITERIA_TYPE_MANUAL = 2
+** BADGE_CRITERIA_TYPE_SOCIAL = 3
+** BADGE_CRITERIA_TYPE_COURSE = 4
+** BADGE_CRITERIA_TYPE_COURSESET = 5
+** BADGE_CRITERIA_TYPE_PROFILE = 6
+** BADGE_CRITERIA_TYPE_BADGE = 7
+** BADGE_CRITERIA_TYPE_COHORT = 8
+** BADGE_CRITERIA_TYPE_COMPETENCY = 9
+
+Depending on the criteria type, other fields must follow so that be badge criteria can be created
+successfully. Otherwise, the badge might be broken. The constants can also use lower case letters.
+
+Each badge needs an image. Images can be automatically created. This can be controlled via the
+following fields:
+
+* `imagecaption` {string} caption for the badge image. When not set, the course short name of the
+previous source course or the just created course is used.
+* `bgcolor` {string} hex annotation for the background color of the badge image (default: 2d89ef).
+* `fgcolor` {string} hex annotation for the text color of the badge image (default: ffffff).
+* `width` {int} image width, default 300.
+* `height` {int} image height, default 300.
+* `imagemode` {string|int} constants how to create the image:
+** TEXT_ONLY = 0: create a square with the course short name, use a GD Font.
+** TEXT_CHECKMARK = 1: create a square with a checkmark and the coure short name below using True Type Fonts.
+** TEXT_TTF = 2: create a square with the course short name, use a True Type Font.
+
+The so created image is used for the badge. Images can be changed later on in Moodle.

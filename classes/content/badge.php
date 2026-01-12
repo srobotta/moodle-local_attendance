@@ -140,6 +140,7 @@ class badge extends modcreate {
         if (is_int($type)) {
             return $type;
         }
+        $type = strtoupper($type);
         if (str_starts_with($type, 'BADGE_CRITERIA_TYPE_') && defined($type)) {
             return constant($type);
         }
