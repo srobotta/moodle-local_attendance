@@ -192,15 +192,15 @@ The badge may have the following fields:
 If a criteria is set for the badge, the following fields are needed:
 
 * `criteriatype` {string|int} name or value of the criteria constants which are:
-** BADGE_CRITERIA_TYPE_ACTIVITY = 1
-** BADGE_CRITERIA_TYPE_MANUAL = 2
-** BADGE_CRITERIA_TYPE_SOCIAL = 3
-** BADGE_CRITERIA_TYPE_COURSE = 4
-** BADGE_CRITERIA_TYPE_COURSESET = 5
-** BADGE_CRITERIA_TYPE_PROFILE = 6
-** BADGE_CRITERIA_TYPE_BADGE = 7
-** BADGE_CRITERIA_TYPE_COHORT = 8
-** BADGE_CRITERIA_TYPE_COMPETENCY = 9
+    * BADGE_CRITERIA_TYPE_ACTIVITY = 1
+    * BADGE_CRITERIA_TYPE_MANUAL = 2
+    * BADGE_CRITERIA_TYPE_SOCIAL = 3
+    * BADGE_CRITERIA_TYPE_COURSE = 4
+    * BADGE_CRITERIA_TYPE_COURSESET = 5
+    * BADGE_CRITERIA_TYPE_PROFILE = 6
+    * BADGE_CRITERIA_TYPE_BADGE = 7
+    * BADGE_CRITERIA_TYPE_COHORT = 8
+    * BADGE_CRITERIA_TYPE_COMPETENCY = 9
 
 Depending on the criteria type, other fields must follow so that be badge criteria can be created
 successfully. Otherwise, the badge might be broken. The constants can also use lower case letters.
@@ -215,8 +215,8 @@ previous source course or the just created course is used.
 * `width` {int} image width, default 300.
 * `height` {int} image height, default 300.
 * `imagemode` {string|int} constants how to create the image:
-** TEXT_ONLY = 0: create a square with the course short name, use a GD Font.
-** TEXT_CHECKMARK = 1: create a square with a checkmark and the coure short name below using True Type Fonts.
-** TEXT_TTF = 2: create a square with the course short name, use a True Type Font.
+    * TEXT_ONLY = 0: create a square with the course short name, use a GD Font.
+    * TEXT_CHECKMARK = 1: create a square with a checkmark and the coure short name below using True Type Fonts.
+    * TEXT_TTF = 2: create a square with the course short name, use a True Type Font.
 
 The so created image is used for the badge. Images can be changed later on in Moodle.
