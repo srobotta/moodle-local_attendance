@@ -16,7 +16,6 @@
 
 namespace local_attendance;
 
-use core\plugininfo\mod;
 use local_attendance\content\badge;
 
 require_once($CFG->dirroot . '/course/lib.php');
@@ -34,7 +33,6 @@ class import_handler {
     private ?\stdClass $sourceCourse = null;
     private ?\stdClass $options = null;
     private ?\stdClass $course = null;
-    private ?\stdClass $badge = null;
 
     public function __construct(?\stdClass $options = null) {
         if ($options !== null) {
@@ -183,6 +181,12 @@ class import_handler {
     public function createBadge(array $data): modcreate_interface {
         if (!\array_key_exists('imagecaption', $data)) {
             $data['imagecaption'] = $this->sourceCourse->shortname ?? $this->course->shortname ?? '';
+        }
+        if (\array_key_exists('imagefile', $data)) {
+            if (!isset($this->options->files) || !\array_key_exists($data['imagefile'], $this->options->files)) {
+                throw new \moodle_exception('ex_filemissing', 'local_attendance', '', $data['imagefile']);
+            }
+            $data['imagefile'] = $this->options->files[$data['imagefile']];
         }
         $badge = new badge();
         $badge->useCourse($this->course)->setRow($data)->create($data);

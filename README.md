@@ -209,6 +209,8 @@ successfully. Otherwise, the badge might be broken. The constants can also use l
 Each badge needs an image. Images can be automatically created. This can be controlled via the
 following fields:
 
+* `imagefile` {string} file name when a separate file has been uploaded via the form and should
+be used in the import.
 * `imagecaption` {string} caption for the badge image. When not set, the course short name of the
 previous source course or the just created course is used.
 * `bgcolor` {string} hex annotation for the background color of the badge image (default: 2d89ef).

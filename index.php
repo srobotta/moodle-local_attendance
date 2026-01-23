@@ -43,25 +43,13 @@ echo $OUTPUT->heading(get_string('pluginname', 'local_attendance'), 2);
 
 if ($mform->is_submitted() && $mform->is_validated()) {
 
-    $formdata = $mform->get_data();
     $importHandler = new import_handler((object)[
-        'suffix' => $formdata->coursesuffix,
+        'suffix' => $mform->getCourseSuffix(),
+        'files' => $mform->getContentFiles(),
     ]);
-    $csvImport = new csv_import($importHandler,$formdata->separator);
-    // Import the uploaded file.             
-    $fs = get_file_storage();
-    $context = \context_user::instance($USER->id);
-    $files = $fs->get_area_files($context->id, 'user', 'draft', $formdata->csvfile);
-    foreach ($files as $file) {
-        if ($file->is_directory()) {
-            continue;
-        }
-        $tempfile = $file->copy_content_to_temp();
-        if ($tempfile === false) {
-            throw new \moodle_exception('Could not copy uploaded file to temporary location.');
-        }
-        $csvImport->importFile($tempfile);
-    }
+    $csvImport = new csv_import($importHandler, $mform);
+    $csvImport->importCsvFile();
+    $mform->cleanupFiles();
     if (!$csvImport->hasError()) {
         echo $OUTPUT->notification(get_string('importsuccess', 'local_attendance'), 'notifysuccess');
     } else {

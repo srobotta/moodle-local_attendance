@@ -66,18 +66,26 @@ class badge extends modcreate {
         $formdata = utils::mergeData($form, $data);
         $this->badge = \badge::create_badge($formdata, $this->course->id);
         // Create badge image. In the form the image is mandatory, so we create one here.
-        $img = new badgeImage(
-            $data['imagecaption'] ?? '',
-            $data['bgcolor'] ?? badgeImage::DEFAULT_BGCOLOR,
-            $data['fgcolor'] ?? badgeImage::DEFAULT_FGCOLOR,
-            $data['width'] ?? badgeImage::DEFAULT_WIDTH,
-            $data['height'] ?? badgeImage::DEFAULT_HEIGHT,
-            $data['imagemode'] ?? badgeImage::TEXT_CHECKMARK
-        );
-        $imgFile = $CFG->tempdir . '/local_attendance_badge_' . time() . '.png';
-        $img->getImageBlob($imgFile);
-        \badges_process_badge_image($this->badge, $imgFile);
-        @unlink($imgFile);
+        if (\array_key_exists('imagefile', $data)) {
+            // Use uploaded image file, use this function instead of badges_process_badge_image because
+            // the image is deleted after processing. We might need it again when importing other badges
+            // from the same CSV file.
+            require_once($CFG->libdir. '/gdlib.php');
+            \process_new_icon($this->badge->get_context(), 'badges', 'badgeimage', $this->badge->id, $data['imagefile']);
+        } else {
+            // Create image based on given parameters.
+            $img = new badgeImage(
+                $data['imagecaption'] ?? '',
+                $data['bgcolor'] ?? badgeImage::DEFAULT_BGCOLOR,
+                $data['fgcolor'] ?? badgeImage::DEFAULT_FGCOLOR,
+                $data['width'] ?? badgeImage::DEFAULT_WIDTH,
+                $data['height'] ?? badgeImage::DEFAULT_HEIGHT,
+                $data['imagemode'] ?? badgeImage::TEXT_CHECKMARK
+            );
+            $imgFile = $CFG->tempdir . '/local_attendance_badge_' . time() . '.png';
+            $img->getImageBlob($imgFile);
+            \badges_process_badge_image($this->badge, $imgFile);
+        }
 
         if (\array_key_exists('criteriatype', $this->row)) {
             // Add criteria if specified in the current row.

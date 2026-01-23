@@ -26,9 +26,9 @@ namespace local_attendance;
  */
 class csv_import {
 
-    public const SEPARATOR_COMMA = ',';
-    public const SEPARATOR_SEMICOLON = ';';
-    public const SEPARATOR_TAB = "\t";
+    public const DELIMITER_COMMA = ',';
+    public const DELIMITER_SEMICOLON = ';';
+    public const DELIMITER_TAB = "\t";
 
     public const CMD_COURSE_COLUMNS = 'COURSE_COLUMNS';
     public const CMD_MODULE_COLUMNS = 'MODULE_COLUMNS';
@@ -40,6 +40,8 @@ class csv_import {
     public const CMD_SKIP_LINE = 'SKIP_LINE';
 
     private import_handler $handler;
+    private upload_form $form;
+    private array $contentfiles = [];
     private string $separator;
     private array $columns;
 
@@ -52,22 +54,22 @@ class csv_import {
      */
     public function __construct(
         ?import_handler $handler = null,
-        $separator = self::SEPARATOR_COMMA
+        ?upload_form $form = null,
     ) {
         if ($handler !== null) {
             $this->handler = $handler;
         }
-        $this->separator = $separator;
+        $this->form = $form;
         $this->columns = [];
         $this->log = [];
     }
 
     /**
      * Import the given CSV file.
-     * @param string $filepath
      * @throws \Exception
      */
-    public function importFile(string $filepath): void {
+    public function importCsvFile(): void {
+        $filepath = $this->form->getCsvFile();
         $handle = fopen($filepath, 'r');
         if ($handle === false) {
             throw new \Exception('Could not open file: ' . $filepath);
@@ -90,7 +92,7 @@ class csv_import {
             if (str_starts_with($line, '#')) {
                 continue; // Skip comment lines.
             }
-            $fields = str_getcsv($line, $this->separator);
+            $fields = str_getcsv($line, $this->form->getCsvDelimiter());
 
             if (!$this->isValidCommand($fields[0])) {
                 $this->log(get_string(

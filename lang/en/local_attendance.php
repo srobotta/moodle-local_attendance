@@ -23,19 +23,23 @@
  */
 
 $string['pluginname'] = 'Attendance Course Creator';
-$string['uploadcsvfile'] = 'Upload CSV file';
-$string['csvseparator'] = 'CSV Separator';
-$string['csvseparatorcomma'] = 'Comma (,)';
-$string['csvseparatorsemicolon'] = 'Semicolon (;)';
-$string['csvseparatortab'] = 'Tab (\t)';
-$string['coursesuffix'] = 'Course generic suffix';
-$string['coursesuffix_help'] = 'This suffix is attached to the course name and in lower case letters to the course short name. Can be overridden in the import file.';
-$string['coursesuffixvalue'] = 'Attendance';
-$string['import'] = 'Import';
+$string['form_btn_import'] = 'Import';
+$string['form_label_uploadcsvfile'] = 'Upload CSV file';
+$string['form_label_csvdelimiter'] = 'CSV delimiter';
+$string['form_label_contentfiles'] = 'Additional content files';
+$string['form_label_contentfiles_help'] = 'You can upload additional files here that are referenced by it\'s name in the CSV file. The files might be used in content that is created in the course or activity.';
+$string['form_label_coursesuffix'] = 'Course generic suffix';
+$string['form_label_coursesuffix_help'] = 'This suffix is attached to the course name and in lower case letters to the course short name. Can be overridden in the import file.';
+$string['form_value_coursesuffix'] = 'Attendance';
+$string['form_opt_csvdelimitercomma'] = 'Comma (,)';
+$string['form_opt_csvdelimitersemicolon'] = 'Semicolon (;)';
+$string['form_opt_csvdelimitertab'] = 'Tab (\t)';
 $string['importsuccess'] = 'Import successful';
 $string['importfailed'] = 'Import completed with errors';
 $string['importlog'] = 'Import Log';
 
+$string['ex_fileuploadfailed'] = 'Uploaded file could not be saved in temporary location.';
+$string['ex_filemissing'] = 'Referenced file "{$a}" not found among uploaded content files.';
 $string['ex_invalidmoduleclass'] = 'Invalid module specified, could not instantiate class "{$a}".';
 $string['ex_invalidimplements'] = 'The module class "{$a}" does not implement the required interface.';
 $string['ex_modulecreationfailed'] = 'Module creation failed.';
