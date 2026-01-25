@@ -99,11 +99,21 @@ class import_handler {
         $catcontext = \context_coursecat::instance($newData['category']);
         require_capability('moodle/course:create', $catcontext);
         $newCourse = create_course((object)$newData);
-        // Copy course enrolments from the source course.
-        if (!\array_key_exists('noparticipants', $newData)) {
-            $this->copyCourseEnrolments($newCourse);
-        } else {
-            unset($newData['noparticipants']);
+
+        // Check whether to add meta enrolment.
+        if (\array_key_exists('metaenrolment', $newData) && $newData['metaenrolment']) {
+            $this->addMetaEnrolment($newCourse);
+        }
+        // Check whether to copy participants.
+        if (\array_key_exists('copyparticipants', $newData) && $newData['copyparticipants']) {
+            $this->copyCourseParticipants($newCourse);
+        }
+        // Now delete the options if they had been set (either 1 or 0).
+        if (\array_key_exists('metaenrolment', $newData)) {
+            unset($newData['metaenrolment']);
+        }
+        if (\array_key_exists('copyparticipants', $newData)) {
+            unset($newData['copyparticipants']);
         }
         $this->sourceCourse = $this->course;
         $this->course = $newCourse;
@@ -144,11 +154,11 @@ class import_handler {
     }
 
     /**
-     * Copy enrolments from the current course to the new course.
+     * Copy enroled participants from the current course to the new course.
      * @param \stdClass $newcourse
      * @return void
      */
-    public function copyCourseEnrolments(\stdClass $newcourse): void {
+    public function copyCourseParticipants(\stdClass $newcourse): void {
         $contextFrom = \context_course::instance($this->course->id);
         $enrols = enrol_get_instances($newcourse->id, true);
 
@@ -169,6 +179,28 @@ class import_handler {
                 }
             }
             break;
+        }
+    }
+
+    /**
+     * Add meta enrolment to the new course from the source course.
+     * @param \stdClass $newcourse
+     * @return void
+     */
+    public function addMetaEnrolment(\stdClass $newcourse): void {
+        $plugins = enrol_get_plugins(true);
+        foreach ($plugins as $plugin) {
+            if ($plugin->get_name() === 'meta') {
+                $enrols = enrol_get_instances($newcourse->id, true);
+                foreach ($enrols as $enrol) {
+                    if ($enrol->enrol === 'meta') {
+                        // Meta enrolment already exists.
+                        return;
+                    }
+                }
+                $plugin->add_instance($newcourse, ['customint1' => $this->course->id]);
+                return;
+            }
         }
     }
 

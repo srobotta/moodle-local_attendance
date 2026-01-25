@@ -92,8 +92,12 @@ the category of the source course is used.
 the same as the source course.
 * `enddate` {int|datetime} timestamp or parsable date string, if not provided use
 the same as the source course.
-* `nopaerticipants` {any} when set, the participants from the source course will not
-be enroled in the new course.
+* `metaenrolment` {0|1} when set, the "Course meta link" enrolment method is added to
+the course, and all participants from the source course will be autmatically synchronized
+with this course. Note, this setting has no effect when this enrolment method is not
+enabled in your Moodle site.
+* `copyparticipants` {0|1} when set, the participants from the source course will be
+enroled manually in the new course.
 
 ## New module
 
