@@ -61,6 +61,18 @@ class badge extends modcreate {
                 $this->course->fullname
             );
         }
+        // Thow an error if there is an invalid criteriatype given.
+        $criteriaType = -1;
+        if (\array_key_exists('criteriatype', $this->row)) {
+            $criteriaType = $this->getConstantForCriteriaType($this->row['criteriatype']);
+            if ($criteriaType === -1) {
+                $a = [
+                    'value' => $this->row['criteriatype'],
+                    'column' => 'criteriatype'
+                ];
+                throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
+            }
+        }
         // Collect all possible fields from the badge form.
         $form = new \core_badges\form\badge('', $data);
         $formdata = utils::mergeData($form, $data);
@@ -87,9 +99,9 @@ class badge extends modcreate {
             \badges_process_badge_image($this->badge, $imgFile);
         }
 
-        if (\array_key_exists('criteriatype', $this->row)) {
+        if ($criteriaType !== -1) {
             // Add criteria if specified in the current row.
-            $this->addCriteria();
+            $this->addCriteria($criteriaType);
         }
         if (!\array_key_exists('badgedisable', $this->row)) {
             // Enable the badge.
@@ -100,13 +112,14 @@ class badge extends modcreate {
 
     /**
      * Add criteria to the created badge, taken from the input data.
+     * @param int $criteriaType
      * @throws \moodle_exception
      */
-    public function addCriteria(): void {
+    public function addCriteria(int $criteriaType): void {
         $context = $this->badge->get_context();
         require_capability('moodle/badges:configurecriteria', $context);
         $params = [
-            'criteriatype' => $this->getConstantForCriteriaType($this->row['criteriatype']),
+            'criteriatype' => $criteriaType,
             'badgeid' => $this->badge->id,
             'course' => $this->course->id,
         ];
