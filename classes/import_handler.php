@@ -90,6 +90,7 @@ class import_handler {
      * @throws \moodle_exception
      */
     public function createCourse(array $data): \stdClass {
+        global $CFG;
         $newData = $data;
         $this->useCourse($data);
         if (!\array_key_exists('shortname', $newData)) {
@@ -114,6 +115,17 @@ class import_handler {
         $catcontext = \context_coursecat::instance($newData['category']);
         require_capability('moodle/course:create', $catcontext);
         $newCourse = create_course((object)$newData);
+
+        if (\array_key_exists('link_new_course', $newData)) {
+            $modLink= [
+                'module' => 'url',
+                'name' => $newData['link_new_course'],
+                'externalurl' => $CFG->wwwroot . '/course/view.php?id=' . $newCourse->id,
+                'section' => 0,
+            ];
+            $this->createModule($modLink);
+            unset($newData['link_new_course']);
+        }
 
         // Check whether to add meta enrolment.
         if (\array_key_exists('metaenrolment', $newData) && $newData['metaenrolment']) {

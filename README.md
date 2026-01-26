@@ -102,6 +102,8 @@ with this course. Note, this setting has no effect when this enrolment method is
 enabled in your Moodle site.
 * `copyparticipants` {0|1} when set, the participants from the source course will be
 enroled manually in the new course.
+* `link_new_course` {string} link text that is inserted as module url in the "general"
+section of the source course that links to the new course.
 
 Note: one of `source_course_id`, `source_course_short`, or `source_course_url` must be
 set.
