@@ -60,16 +60,21 @@ BADGE;BADGE_CRITERIA_TYPE_COURSE;2
 ## New course
 
 To create a new activity, a course is needed first. The use case assumes that you have a
-course and want to add attendance tracking. This cannot be done in the same course, but in parallel to the teaching course.
+course and want to add attendance tracking. This cannot be done in the same course,
+but in parallel to the teaching course.
 Therefore, a new course is created via the command `COURSE` in the import file. The `COURSE`
-command accepts one of `source_course_id` for the course id or `source_couse_short` for
-the short name of the course that serves as the teaching course. The attendance course
+command accepts one of `source_course_id` for the course id, `source_couse_short` for
+the short name of the course or `source_course_url` for the url of the course that
+serves as the teaching course. The attendance course
 is setup based on the teaching source course. However, some fields can be set in the
 import file to change some aspects of the new course. See valid course columns above for
 details.
 The basic fields like start and endtime and category are taken from the source course
-when not explicitly set in the import file. Also, all course participants from the source
-course will be also enroled in the new course.
+when not explicitly set in the import file. Be default, the new attendance course has
+no students enroled. Enrolments can be copied from the source course by setting the
+column `copyparticipants` to 1. A even more elegant solution is to enable the "Course
+meta link" enrolment via setting the column `metaenrolment` to 1. However, for this
+to work, the enrolment method must be enabled at your site.
 
 The `USE_COURSE` command can be used instead if the `COURSE` command.
 In this case, the defined existing course is used to create the activities in,
