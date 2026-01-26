@@ -115,6 +115,10 @@ class modcreate implements modcreate_interface {
         // Setup some required fields that are not in the form.
         $formData->modulename = $modname;
         $formData->visible = 1;
+        // Thow an error if there is no module name given.
+        if (empty($formData->name)) {
+            throw new \moodle_exception('ex_modnamemempty', 'local_attendance');
+        }
         $this->moduleinfo = add_moduleinfo($formData, $this->course, $mform);
         return $this;
     }

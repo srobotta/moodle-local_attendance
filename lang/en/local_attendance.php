@@ -48,6 +48,7 @@ $string['ex_invalidpasswdrule'] = 'Invalid rule "{$a->rule}" for password genera
 $string['ex_invalidpasswdrulecontent'] = 'Invalid content in wordlist "{$a->file}" for password generation.';
 $string['ex_missingfield'] = 'Missing required field "{$a->field}".';
 $string['ex_nosourcecourse'] = 'No source course defined in course data.';
+$string['ex_modnamemempty'] = 'Module name is empty.';
 
 $string['csv_importexception'] = 'Line {$a->line}: An exception occurred: {$a->message}';
 $string['csv_import_invalidcommand'] = 'Line {$a->line}: Invalid command {$a->cmd} in CSV file.';
