@@ -254,7 +254,7 @@ class quiz extends modcreate {
         }
         // Sanitize the rule to avoid path traversal.
         $rule = preg_replace('/[^a-z_]/', '', $this->passwordRule);
-        $ruleFile = __DIR__ . '/../wordlist/' . $rule . '.csv';
+        $ruleFile = __DIR__ . '/../../wordlist/' . $rule . '.csv';
         // Pick a random line from the wordlist file and use that as password.
         if (file_exists($ruleFile)) {
             $passwords = explode("\n", file_get_contents($ruleFile));
