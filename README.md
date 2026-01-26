@@ -80,10 +80,9 @@ Valid course columns are:
 on the source course).
 * `shortname` {string} short name of the course (can be empty, then a suffix will
 be attached to the short name of the source course).
-* `source_course_id` {int} id of the source course, if not set then `source_course_short`
-must be set.
-* `source_course_short` {string} short name of the source course, if not set then
-`source_course_id` must be set.
+* `source_course_id` {int} id of the source course.
+* `source_course_short` {string} short name of the source course.
+* `source_course_url` {string} url to the source course.
 * `category` {int} category id where the attendance course is created in. If empty
 the category of the source course is used.
 * `visible` {0|1}  if not provided use the same as the source course.
@@ -98,6 +97,9 @@ with this course. Note, this setting has no effect when this enrolment method is
 enabled in your Moodle site.
 * `copyparticipants` {0|1} when set, the participants from the source course will be
 enroled manually in the new course.
+
+Note: one of `source_course_id`, `source_course_short`, or `source_course_url` must be
+set.
 
 ## New module
 

@@ -49,7 +49,7 @@ class import_handler {
      * @throws \moodle_exception
      */
     public function useCourse(array $data): \stdClass {
-        global $DB;
+        global $CFG, $DB;
         if (\array_key_exists('source_course_id', $data)) {
             $this->course = get_course($data['source_course_id']);
             unset($data['source_course_id']);
@@ -64,6 +64,21 @@ class import_handler {
             );
             unset($data['source_course_short']);
             return $this->course;
+        }
+        if (\array_key_exists('source_course_url', $data)) {
+            if (str_contains($data['source_course_url'], $CFG->wwwroot . '/course/view.php')) {
+                [$foo, $query] = explode('?', $data['source_course_url'], 2);
+                if (!is_null($query) && preg_match('/\bid=(\d+)\b$/', $query, $matches)) {
+                    $this->course = get_course($matches[1]);
+                    unset($data['source_course_url']);
+                    return $this->course;
+                }
+            }
+            $a = [
+                'value' => $data['source_course_url'],
+                'column' => 'source_course_url'
+            ];
+            throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
         }
         throw new \moodle_exception('ex_nosourcecourse', 'local_attendance');
     }
