@@ -128,7 +128,8 @@ to setup the activity. For a quiz this would be:
 
 * `quizpassword` {string} set a specific password to enter the quiz. If not set, a password
 is created automatically (see below). If set but empty, then no access password is used.
-* `attempts` {int} the number of attempts, default is 1.
+* `attempts` {int} the number of attempts, when set this is added to the condition for completion.
+If not, only the grade is considered.
 * `timelimit` {int} the number of seconds how long the quiz might be answered, default is 60.
 
 ### Columns for attentance courses

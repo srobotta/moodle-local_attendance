@@ -109,9 +109,6 @@ class quiz extends modcreate {
         if (!\array_key_exists('timelimit', $data)) {
             $data['timelimit'] = 60; // 1 minute time limit.
         }
-        if (!\array_key_exists('attempts', $data)) {
-            $data['attempts'] = 1;
-        }
         // One question with 1 point is sufficient for attendance.
         $data['gradepass'] = 1.0;
         $data['grade'] = 1.0;
