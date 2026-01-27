@@ -62,4 +62,57 @@ class utils {
         }
         return $formData;
     }
+
+    /**
+     * Convert a value to COMPLETION_AGGREGATION_ANY or COMPLETION_AGGREGATION_ALL.
+     * Empty values are converted to COMPLETION_AGGREGATION_ALL.
+     * @param string $key The name of the field (for error messages).
+     * @param array $data The data array containing the value.
+     * @return int
+     */
+    public static function anyOrAll(string $key, array $data): int {
+        if (!\array_key_exists($key, $data) || empty(trim((string)$data[$key]))) {
+            return COMPLETION_AGGREGATION_ALL;
+        }
+        $value = strtolower(trim((string)$data[$key]));
+        $validValues = ['all', 'any', (string)COMPLETION_AGGREGATION_ALL, (string)COMPLETION_AGGREGATION_ANY];
+        if (!in_array($value, $validValues)) {
+            $a = [
+                'value' => $data[$key],
+                'column' => $key
+            ];
+            throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
+        }
+        if ($value === 'any' || $value == (string)COMPLETION_AGGREGATION_ANY) {
+            return COMPLETION_AGGREGATION_ANY;
+        }
+        return COMPLETION_AGGREGATION_ALL;
+    }
+
+    /**
+     * Parse a date/time value from the data array.
+     * @param string $key The name of the field (for error messages).
+     * @param array $data The data array containing the value.
+     * @return int The timestamp.
+     * @throws \moodle_exception If the value cannot be parsed.
+     */
+    public static function parseDateTime(string $key, array $data): int {
+        $strVal = trim($data[$key]);
+        $intVal = (int)$data[$key];
+        if ((string)$intVal === $strVal) {
+            // Value is an integer timestamp.
+            return $intVal;
+        }
+        $timestamp = strtotime($strVal);
+        if (!empty($timestamp)) {
+            // We got a valid timestamp from the string.
+            return $timestamp;
+        }
+        throw new \moodle_exception(
+            'ex_invalidvalue',
+            'local_attendance',
+            '',
+            ['value' => $data[$key], 'column' => $key]
+        );
+    }
 }

@@ -133,7 +133,7 @@ class badge extends modcreate {
             $criteriaOverall->save(['agg' => BADGE_CRITERIA_AGGREGATION_ALL]);
         }
 
-        // Add specificcriteria to the badge.
+        // Add specific criteria to the badge.
         $criteria = \award_criteria::build($params);
         foreach ($criteria->optional_params as $param) {
             if (isset($this->row[$param])) {

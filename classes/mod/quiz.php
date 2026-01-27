@@ -19,6 +19,7 @@ namespace local_attendance\mod;
 use mod_quiz\quiz_settings;
 use local_attendance\modcreate;
 use local_attendance\modcreate_interface;
+use local_attendance\utils\utils;
 
 /**
  * Custom implementation to create all necessary modules for an attendance course.
@@ -89,17 +90,7 @@ class quiz extends modcreate {
             if (\array_key_exists($key, $data) === false) {
                 throw new \moodle_exception('ex_missingfield', 'local_attendance', '', ['field' => $key]);
             }
-            if (!is_int($data[$key])) {
-                $data[$key] = strtotime($data[$key]);
-                if ($data[$key] === false) {
-                    throw new \moodle_exception(
-                        'ex_invalidvalue',
-                        'local_attendance',
-                        '',
-                        ['value' => $data[$key], 'column' => $key]
-                    );
-                }
-            }
+            $data[$key] = utils::parseDateTime($key, $data);
         }
         // If the quiz password is not set, set a default one from a list.
         if (empty($data['quizpassword'])) {
@@ -109,14 +100,16 @@ class quiz extends modcreate {
         if (!\array_key_exists('timelimit', $data)) {
             $data['timelimit'] = 60; // 1 minute time limit.
         }
+
         // One question with 1 point is sufficient for attendance.
         $data['gradepass'] = 1.0;
         $data['grade'] = 1.0;
         $data['sumgrades'] = 1.0;
         // Completion tracking based on passing the quiz.
         $data['completion'] = COMPLETION_TRACKING_AUTOMATIC;
+        $data['completionminattempts'] = 0;
         $data['completionusegrade'] = 1;
-        $data['completionpassgrade'] = 1.0;
+        $data['completionpassgrade'] = 0;
         $data['completionexpected'] = 0; // No expected date.
 
         // Create the module now.

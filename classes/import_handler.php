@@ -17,6 +17,7 @@
 namespace local_attendance;
 
 use local_attendance\content\badge;
+use local_attendance\utils\utils;
 
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/edit_form.php');
@@ -142,9 +143,122 @@ class import_handler {
         if (\array_key_exists('copyparticipants', $newData)) {
             unset($newData['copyparticipants']);
         }
+        // Set course completions.
+        foreach ($newData as $key => $value) {
+            if (str_starts_with($key, 'completion_criteria_')) {
+                $this->addCourseCompletion($newCourse, $newData);
+                break;
+            }
+        }
         $this->sourceCourse = $this->course;
         $this->course = $newCourse;
         return $this->course;
+    }
+
+    /**
+     * Add course completion criteria to the new course.
+     * @param \stdClass $newCourse
+     * @param array $newData
+     * @return void
+     */
+    protected function addCourseCompletion(\stdClass $newCourse, array $newData): void {
+        global $CFG;
+        // Classes must be loaded here.
+        require_once($CFG->libdir.'/completionlib.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_self.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_date.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_unenrol.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_duration.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_grade.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_role.php');
+        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_course.php');
+
+        // Prepare data object for criteria.
+        $data = [
+            'id' => $newCourse->id,
+        ];
+        $data['overall_aggregation'] = \array_key_exists('completion_criteria_overall_aggregation', $newData)
+            ? utils::anyOrAll('completion_criteria_overall_aggregation', $newData) : COMPLETION_AGGREGATION_ALL;
+        $data['activity_aggregation'] = 0;
+        if (\array_key_exists('completion_criteria_activity', $newData)) {
+            $activityIds = \array_map('intval', explode(',', $newData['completion_criteria_activity']));
+            if (!empty($activityIds)) {
+                $data['criteria_activity'] = array_fill_keys($activityIds, 1);
+                $data['activity_aggregation'] = utils::anyOrAll('completion_criteria_activity_aggregation', $newData);
+            }
+        }
+        $data['course_aggregation'] = 0;
+        if (\array_key_exists('completion_criteria_course', $newData)) {
+            $data['criteria_course'] = \array_map('intval', explode(',', $newData['completion_criteria_course']));
+            if (!empty($data['criteria_course'])) {
+                $data['course_aggregation'] = utils::anyOrAll('completion_criteria_course_aggregation', $newData);
+            }
+        }
+        $data['role_aggregation'] = 0;
+        if (\array_key_exists('completion_criteria_role', $newData)) {
+            $roles = \array_map('intval', explode(',', $newData['completion_criteria_role']));
+            if (!empty($roles)) {
+                $data['criteria_role'] = array_fill_keys($roles, 1);
+                $data['role_aggregation'] = utils::anyOrAll('completion_criteria_role_aggregation', $newData);
+            }
+        }
+        // Simple criteria value mapping
+        foreach (['date', 'duration', 'grade'] as $criterium) {
+            if (\array_key_exists('completion_criteria_' . $criterium, $newData)) {
+                $data['criteria_' . $criterium] = 1;
+                $data['criteria_' . $criterium . '_value'] = $criterium === 'date'
+                    ? utils::parseDateTime('completion_criteria_' . $criterium, $newData)
+                    : $newData['completion_criteria_' . $criterium];
+            }
+        }
+        foreach (['unenrol', 'self'] as $criterium) {
+            if (\array_key_exists('completion_criteria_' . $criterium, $newData)) {
+                $data['criteria_' . $criterium] = (int)$newData['completion_criteria_' . $criterium] === 1 ? 1 : 0;
+            }
+        }
+        $data = (object)$data;
+
+        $completion = new \completion_info($newCourse);
+        // Delete old criteria.
+        $completion->clear_criteria(false);
+
+        // Loop through each criteria type and run its update_config() method.
+        global $COMPLETION_CRITERIA_TYPES;
+        foreach ($COMPLETION_CRITERIA_TYPES as $type) {
+            $class = '\\completion_criteria_'.$type;
+            $criterion = new $class();
+            $criterion->update_config($data);
+        }
+
+        // Handle overall aggregation.
+        $aggdata = [
+            'course' => $data->id,
+            'criteriatype' => null
+        ];
+        $aggregation = new \completion_aggregation($aggdata);
+        $aggregation->setMethod($data->overall_aggregation);
+        $aggregation->save();
+
+        // Handle aggregation types.
+        $aggregationTypes = [
+            COMPLETION_CRITERIA_TYPE_ACTIVITY => $data->activity_aggregation,
+            COMPLETION_CRITERIA_TYPE_COURSE => $data->course_aggregation,
+            COMPLETION_CRITERIA_TYPE_ROLE => $data->role_aggregation,
+        ];
+        foreach ($aggregationTypes as $type => $method) {
+            $aggdata['criteriatype'] = $type;
+            $aggregation = new \completion_aggregation($aggdata);
+            $aggregation->setMethod($method);
+            $aggregation->save();
+        }
+
+        // Trigger an event for course module completion changed.
+        $event = \core\event\course_completion_updated::create([
+            'courseid' => $newCourse->id,
+            'context' => \context_course::instance($newCourse->id)
+        ]);
+        $event->trigger();
     }
 
     /**

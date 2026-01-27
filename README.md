@@ -104,6 +104,25 @@ enabled in your Moodle site.
 enroled manually in the new course.
 * `link_new_course` {string} link text that is inserted as module url in the "general"
 section of the source course that links to the new course.
+* `completion_criteria_overall_aggregation` {1|2|all|any} whether any or all of the given
+completion crtieria must be fullfilled.
+* `completion_criteria_activity` {string} a comma separated list of activity ids, that
+must be completed.
+* `completion_criteria_activity_aggregation` {1|2|all|any}, makes sense only when
+`completion_criteria_activity` is set to complete any or all the activities.
+* `completion_criteria_course` {string} a comma separated list of course ids, that
+must be completed.
+* `completion_criteria_course_aggregation` {1|2|all|any}, makes sense only when
+`completion_criteria_course` is set to complete any or all the courses.
+* `completion_criteria_role` {string} a comma separated list of role ids, that
+may set the course to be completed
+* `completion_criteria_role_aggregation` {1|2|all|any}, makes sense only when
+`completion_criteria_role` is set to allow complete course by user of one specific roles or one from each role.
+* `completion_criteria_date` {datetime} set date when the coruse is set to be completed.
+* `completion_criteria_duration` {int} set a duration in days after user enrolment.
+* `completion_criteria_grade` {float} set a grade that the user must achieve over all activities in the course.
+* `completion_criteria_unenrol` {0|1} course is completed when user is unenroled from the course.
+* `completion_criteria_self` {0|1} course can be set manually as completed by the user.
 
 Note: one of `source_course_id`, `source_course_short`, or `source_course_url` must be
 set.
@@ -128,8 +147,6 @@ to setup the activity. For a quiz this would be:
 
 * `quizpassword` {string} set a specific password to enter the quiz. If not set, a password
 is created automatically (see below). If set but empty, then no access password is used.
-* `attempts` {int} the number of attempts, when set this is added to the condition for completion.
-If not, only the grade is considered.
 * `timelimit` {int} the number of seconds how long the quiz might be answered, default is 60.
 
 ### Columns for attentance courses
