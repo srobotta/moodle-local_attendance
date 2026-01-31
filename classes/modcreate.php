@@ -84,22 +84,44 @@ class modcreate implements modcreate_interface {
         unset($data['module']);
         // Include the course lib to have the course related functions available.
         require_once($CFG->dirroot . '/course/modlib.php');
-        // At which section in the course to add the module? Default is 1.
-        $sectionnum = 1;
+        // At which section in the course to add the module? Default is 0 (General).
+        // In the csv we start counting sections at 1, so we need to subtract 1.
+        $sectionnum = 0;
         if (\array_key_exists('sectionid', $data)) {
             $sectionnum = get_fast_modinfo($this->course)
                 ->get_section_info_by_id($data['sectionid'], MUST_EXIST)
                 ->sectionnum;
             unset($data['sectionid']);
         } elseif (\array_key_exists('section', $data)) {
-            $sectionnum = $data['section'];
+            $sectionnum = (int)$data['section'] - 1;
+            if ($sectionnum < 0) { // Just in case someone puts section 0 in the csv of the field is empty.
+                $sectionnum = 0;
+            }
             unset($data['section']);
+        }
+        if (\array_key_exists('section_pos', $data)) {
+            // Section position is also accepted.
+            $modules = \course_modinfo::get_array_of_activities($this->course);
+            $posCounter = 0;
+            foreach ($modules as $mod) {
+                if ($mod->section == $sectionnum) {
+                    $posCounter++;
+                    if ($posCounter >= $data['section_pos']) {
+                        $beforeModule = $mod->cm;
+                        break;
+                    }
+                }
+            }
+            unset($data['section_pos']);
         }
 
         // Prepare the data for the new module.
         [$mod, $context, $cw, $cm, $modInfoData] = prepare_new_moduleinfo_data($this->course, $modname, $sectionnum);
         $modInfoData->add = $modname;
         $modInfoData->modulename = $modname;
+        if (isset($beforeModule)) {
+            $modInfoData->beforemod = $beforeModule;
+        }
         // Prepare the form in order to get default values for the module, also validation can be done here.
         $modmoodleform = "$CFG->dirroot/mod/{$modname}/mod_form.php";
         if (file_exists($modmoodleform)) {

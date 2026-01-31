@@ -111,12 +111,18 @@ class import_handler {
         if (\array_key_exists('numsections', $newData)) {
             unset($newData['numsections']);
         }
+        // However, check if section_name_X fields are present to create those sections later.
+        $newSectionData = $this->getNewSectionData($newData);
 
         // Check permissions before creating the course.
         $catcontext = \context_coursecat::instance($newData['category']);
         require_capability('moodle/course:create', $catcontext);
         $newCourse = create_course((object)$newData);
 
+        // Create sections in the new course if any section names were given.
+        $this->createSections($newCourse, $newSectionData);
+
+        // Link the new course in the source course by adding a URL module in the old course.
         if (\array_key_exists('link_new_course', $newData)) {
             $modLink= [
                 'module' => 'url',
@@ -124,8 +130,16 @@ class import_handler {
                 'externalurl' => $CFG->wwwroot . '/course/view.php?id=' . $newCourse->id,
                 'section' => 0,
             ];
-            $this->createModule($modLink);
             unset($newData['link_new_course']);
+            if (\array_key_exists('link_new_course_section', $newData)) {
+                $modLink['section'] = (int)$newData['link_new_course_section'];
+                unset($newData['link_new_course_section']);
+            }
+            if (\array_key_exists('link_new_course_section_position', $newData)) {
+                $modLink['section_pos'] = (int)$newData['link_new_course_section_position'];
+                unset($newData['link_new_course_section_position']);
+            }
+            $this->createModule($modLink);
         }
 
         // Check whether to add meta enrolment.
@@ -144,15 +158,77 @@ class import_handler {
             unset($newData['copyparticipants']);
         }
         // Set course completions.
-        foreach ($newData as $key => $value) {
+        foreach (\array_keys($newData) as $key) {
             if (str_starts_with($key, 'completion_criteria_')) {
                 $this->addCourseCompletion($newCourse, $newData);
                 break;
             }
         }
+        // Done, we rembember the source course and return the new course.
         $this->sourceCourse = $this->course;
         $this->course = $newCourse;
         return $this->course;
+    }
+
+
+    /**
+     * Get new section data from the CSV row, in case there are any.
+     * @param array $newData from the CSV
+     * @return array of sectionnum => sectionname
+     * @throws \moodle_exception
+     */
+    protected function getNewSectionData(array &$newData): array {
+        $newSectionData = [];
+        foreach (\array_keys($newData) as $key) {
+            if (str_starts_with($key, 'section_name_')) {
+                $sectionparts = explode('_', $key);
+                if (count($sectionparts) === 3) {
+                    $sectionnum = (int)$sectionparts[2] - 1;
+                    if ($sectionnum < 0) {
+                        $a = [
+                            'value' => $sectionparts[2],
+                            'column' => $key
+                        ];
+                        throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
+                    }
+                    $sectionname = $newData[$key];
+                    if (trim($sectionname) === '') {
+                        $a = [
+                            'value' => $sectionname,
+                            'column' => $key
+                        ];
+                        throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
+                    }
+                    $newSectionData[$sectionnum] = $sectionname;
+                    unset($newData[$key]);
+                }
+            }
+        }
+        for ($i = 0; $i < max(\array_keys($newSectionData)) + 1; $i++) {
+            if (!\array_key_exists($i, $newSectionData)) {
+                $newSectionData[$i] = '';
+            }
+        }
+        ksort($newSectionData);
+        return $newSectionData;
+    }
+
+    /**
+     * Create sections in the new course based on the given data.
+     * @param \stdClass $newCourse
+     * @param array $newSectionData
+     * @return void
+     */
+    protected function createSections(\stdClass $newCourse, array $newSectionData): void {
+        $existingsSections = get_fast_modinfo($newCourse)->get_section_info_all();
+        foreach ($newSectionData as $sectionNum => $sectionName) {
+            $section = !\array_key_exists($sectionNum, $existingsSections)
+                ? course_create_section($newCourse->id)
+                : $existingsSections[$sectionNum];
+            if (!empty($sectionName)) {
+                course_update_section($newCourse->id, $section, ['name' => $sectionName]);
+            }
+        }
     }
 
     /**

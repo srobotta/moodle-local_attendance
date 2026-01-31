@@ -90,6 +90,8 @@ be attached to the short name of the source course).
 * `source_course_url` {string} url to the source course.
 * `category` {int} category id where the attendance course is created in. If empty
 the category of the source course is used.
+* `section_name_X` {string} section name (X is the section number) for a new section to
+be generated in the course.
 * `visible` {0|1}  if not provided use the same as the source course.
 * `format` {string} if not provided use the same as the source course.
 * `startdate` {int|datetime} timestamp or parsable date string, if not provided use
@@ -102,8 +104,34 @@ with this course. Note, this setting has no effect when this enrolment method is
 enabled in your Moodle site.
 * `copyparticipants` {0|1} when set, the participants from the source course will be
 enroled manually in the new course.
-* `link_new_course` {string} link text that is inserted as module url in the "general"
+
+Note: one of `source_course_id`, `source_course_short`, or `source_course_url` must be
+set.
+
+### Link new course from source course
+
+You may place the new course anywhere in your Moodle course structure. By default the
+new course is created in the same category as the source course. For the attendance use case
+we want a different category, because the attendance courses should not show up in the
+existing course structure. Still the attendance course should be found from the main
+course where attendance should be tracked. Therefore, we need a link from the main course
+to the attendance course. This can be done via the following columns in the `COURSE_COLUMNS`:
+
+* `link_new_course` {string} link text that is inserted as module URL in the first
 section of the source course that links to the new course.
+* `link_new_course_section` {int} section number, when the URL module should be inserted in
+another existing section (counting starts at 1).
+* `link_new_course_section_position` {int} the position inside the module, where the new
+URL module should be inserted.
+
+The latter two columns take effect only, when `link_new_course` is actually set. Otherwise,
+they are ignored because no link in the source course will be created.
+
+### Course completion
+
+The new course may have completion criteria set. These columns are defined as well in the
+`COURSE_COLUMNS`. In the `COURSE` commands these columns must be filled with values.
+
 * `completion_criteria_overall_aggregation` {1|2|all|any} whether any or all of the given
 completion crtieria must be fullfilled.
 * `completion_criteria_activity` {string} a comma separated list of activity ids, that
@@ -124,8 +152,37 @@ may set the course to be completed
 * `completion_criteria_unenrol` {0|1} course is completed when user is unenroled from the course.
 * `completion_criteria_self` {0|1} course can be set manually as completed by the user.
 
-Note: one of `source_course_id`, `source_course_short`, or `source_course_url` must be
-set.
+For Attendance courses, this is essential because the successful participation in a course
+is controlled by the course completion. In our use case we define:
+
+* `completion_criteria_grade` with a grade that must be reached in the course for all attendance
+questions. Each question is rewarded with 1 point. If you have 10 presence dates and want to
+have 80% of attendancy, then the grade must be 8.
+* `completion_criteria_date` this is set with the date of (or better after) the last day of
+presence. Even though students have the minimum threshold of necessary attendance dates fulfiled
+already, the attendance badge should not be rewarded before the course is terminated.
+
+### Course sections
+
+When a course is created, by default there is one section "General" and there is usually a 
+anouncement forum. The exact behaviour can be influenced via admin settings. This plugins
+does not create other sections besides the default section. However, you may set section
+names in the CSV and also control where modules are created.
+
+In the course columns you define a new section by `section_name_X` where X is a number of
+1 and higher. In the `COURSE` row you set the section name of that particular section.
+
+This following example demonstrates it:
+```
+COURSE_COLUMNS;source_course_id;name;section_name_1;section_name_2;section_name_3
+COURSE;1;My Atendance course;Obligated Modules;Voluntary Modules;Other
+```
+
+This would create a course with 3 sections with the names "Obligated Modules",
+"Voluntary Modules" and "Other". You could even skip `section_name_2`. In this
+case section 2 is still generated, because there is section 3 defined and there
+can't be an undefined section. However, the section name is set with the default
+value for section 2 because it is not explicit defined.
 
 ## New module
 
@@ -138,6 +195,8 @@ to load a class `\frankenstyle_plugin\mod\someclass` which must implement the in
 
 * `section` {int} section identified number where to add the activity. If not set, 1 is used.
 * `sectionid` {int} section identified by id where to add the activity. If not set `section` is used.
+* `section_pos` {int} position where the new module is placed inside the given section. By default,
+the module is appended after the last existing module in that section.
 * `name` {string} name of the activity.
 * `timeopen` {datetime} parsable date time string for the time when the activity opens.
 * `timeclose` {datetime} parsable date time string for the closing time when the activity finishes.
