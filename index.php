@@ -22,9 +22,10 @@ use local_attendance\upload_form;
 
 global $OUTPUT, $USER, $PAGE, $CFG;
 
+$pageUrl = new moodle_url('/local/attendance/index.php');
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/attendance/index.php'));
+$PAGE->set_url($pageUrl);
 $PAGE->set_pagelayout('admin');
 
 if (!$course = get_site()) {
@@ -61,6 +62,7 @@ if ($mform->is_submitted() && $mform->is_validated()) {
         echo $logentry . "\n";
     }
     echo '</pre>';
+    echo $OUTPUT->single_button($pageUrl, get_string('back'), 'get');
 } else {
     $mform->display();
 }
