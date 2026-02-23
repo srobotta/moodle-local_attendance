@@ -46,6 +46,7 @@ $string['ex_modulecreationfailed'] = 'Module creation failed.';
 $string['ex_invalidvalue'] = 'Invalid value "{$a->value}" for column "{$a->column}".';
 $string['ex_invalidpasswdrule'] = 'Invalid rule "{$a->rule}" for password generation, csv file for wordlist not found.';
 $string['ex_invalidpasswdrulecontent'] = 'Invalid content in wordlist "{$a->file}" for password generation.';
+$string['ex_metaenrolmentnotpossible'] = 'Course meta link enrolment is not possible because method is not available.';
 $string['ex_missingfield'] = 'Missing required field "{$a->field}".';
 $string['ex_nosourcecourse'] = 'No source course defined in course data.';
 $string['ex_modnamemempty'] = 'Module name is empty.';

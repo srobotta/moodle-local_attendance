@@ -418,6 +418,7 @@ class import_handler {
                 return;
             }
         }
+        throw new \moodle_exception('ex_metaenrolmentnotpossible', 'local_attendance');
     }
 
     /**
