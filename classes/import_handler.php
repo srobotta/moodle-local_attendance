@@ -143,14 +143,14 @@ class import_handler {
         }
 
         // Check whether to add meta enrolment.
-        if (\array_key_exists('metaenrolment', $newData) && $newData['metaenrolment']) {
+        if (utils::isSetAndEnabled('metaenrolment', $newData)) {
             $this->addMetaEnrolment($newCourse);
         }
         // Check whether to copy participants.
-        if (\array_key_exists('copyparticipants', $newData) && $newData['copyparticipants']) {
+        if (utils::isSetAndEnabled('copyparticipants', $newData)) {
             $this->copyCourseParticipants($newCourse);
         }
-        // Now delete the options if they had been set (either 1 or 0).
+        // Now delete the options if they had been set but maybe not enabled.
         if (\array_key_exists('metaenrolment', $newData)) {
             unset($newData['metaenrolment']);
         }
@@ -169,7 +169,6 @@ class import_handler {
         $this->course = $newCourse;
         return $this->course;
     }
-
 
     /**
      * Get new section data from the CSV row, in case there are any.

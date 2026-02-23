@@ -115,4 +115,19 @@ class utils {
             ['value' => $data[$key], 'column' => $key]
         );
     }
+
+    /**
+     * Check if an option is set in the given data and also is enabled, when the value is one of
+     * '1', 'true', 'yes', 'y', 'x' (case-insensitive)
+     * @param string $key The name of the field
+     * @param array $data The data array representing the CSV row
+     * @return bool True if option is enabled, false otherwise.
+     */
+    public static function isSetAndEnabled(string $key, array $data): bool {
+        if (!\array_key_exists($key, $data)) {
+            return false;
+        }
+        $yes = strtolower(get_string('yes'));
+        return \in_array(strtolower($data[$key]), ['1', 'true', 'y', 'x', $yes], true);
+    }
 }
