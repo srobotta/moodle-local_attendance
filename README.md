@@ -15,15 +15,20 @@ Moodle course. The tracking is not done in the course directly that
 is used for teaching, because the completion tracking depends on the
 presence only and not of the assessements that a student must fulfill.
 Therefore, to track the attendance of a course, a parallel Moodle course
-is required that only tracks the presence and awards the studend a badge
-upon successful course completion (e.g. when a certain threshold of presence
-items is reached). This is done by presenting the students a simple
-quiz with one question that they must answer successfully so that their
-presence is counted. The quiz is open for the course presence time only
-and is password protected.
+(a so called shadow course) is required that only tracks the attendance
+and awards the student a badge upon successful course completion (e.g.
+when a certain threshold of presence items is reached). The attendance is
+tracked by presenting the student a simple quiz with one question that
+they must answer so that their presence is counted. The quiz is open for
+the course presence time only and is password protected. The password is
+revealed during the presence time. Some teachers reported that the password
+for the test was given at the end of the presence time, to keep the students
+attention until the end of the event.
 
-The plugin offers an upload form so that managers can prepare an import
-file with the course data to automatically create such courses.
+This plugin offers an upload form so that managers can prepare an import
+file with the course data to automatically create such courses. The plugin
+includes also templates in OpenOffice format that should make it easier to
+create the required input CSV file.
 
 ## Import file format
 
@@ -313,3 +318,136 @@ previous source course or the just created course is used.
     * TEXT_TTF = 2: create a square with the course short name, use a True Type Font.
 
 The so created image is used for the badge. Images can be changed later on in Moodle.
+
+## OpenOffice templates
+
+In the plugin directory the folder `office-templates` contains OpenOffice templates that can be used
+for creating the course list and finally saving the file as CSV and then use it in the import.
+
+### Attendance template
+
+The `Attendance.odt` template contains basically our use case that was the motivation for creating this plugin.
+The lines starting with `#` are there for documentation, will be contained when saving a CSV but
+are ignored during the import.
+
+#### Predefined fields
+
+Row _2_ and _3_ hold some predefinded data, that is used in the document later on in other cells. The
+fieldnames are in row _2_ as defined in the import, the actual values are in row _3_. In _C2_ the
+field name `link_new_course` is the explanation for field _C3_. This value is used in all
+`COURSE` rows in column _H_, with the field type defined in _H5_ (in the course columns). Likewise
+the question text for all attendance quizzes is taken from _B3_ (used in _H_ for all module columns).
+
+#### Course and dates
+
+The course for which the attendance is required is defined
+in cell _B8_. Adapt the link to your course. In case if you want to use the short course name,
+change the cell _B5_ to `source_course_short` and enter the correct short name in _B8_.
+
+The course name in _C8_ is not used for identifying the course. It is used as a reference for
+the trainer to have a readable name of the course. However, the cell content is used in the
+cell _D9_ where the badge description is defined.
+
+The template is prefilled with some data that must be changed. Attendance dates are starting from
+row 10 with the `MODULE` command and the value `local_attendance_quiz` in column _B_ where the
+module technical name is defined.
+
+The name of the quiz (Attendance for day X afternoon) that the student must visit to confirm
+the attendance of that single event, is defined in column _C_ (field `name` of the module columns).
+To have a nicer label, the start and end date from columns _D_ and _E_ are used and concatenated
+in a formula. This content must be copied in a way, that each row refers to their corresponding
+columns in the same row.
+
+**Note**: If you use a German (or other language) Office program, the formula in the _C_ columns
+must be adjusted to use the correct date fields. In German the field content may look like:
+
+```
+=CONCAT("Nachweis der Anwesenheit am ", TEXT(D10, "TT.MM.JJJJ"), " ",  IF(TEXT(D10, "HH") < "12", "vor", "nach"), "mittags.")
+```
+
+#### Completion criteria
+
+Cells _F8_ and _F9_ are both for the completion criteria, e.g. how many times a student must
+tick the attendance to receive the badge for completion. This number depends on the number of
+dates below (in the template there are 17 from row 10 - 27) where a student may miss three
+ocurrences but is still rewarded the badge.
+
+#### Additional files
+
+The badge image defined in _E8_ must be separately uploaded in the import form. The uploaded
+image name must be the same as in the templated. If the image cannot be found, the import is
+skiped for this course.
+
+#### Participants
+
+To make things easy, the template assumes that your Moodle has the "Course meta enrolment" enabled
+so that students (ant teachers) are automatically enroled in the attendence course, when they
+are enroled in the main course for which attendance is required. With this setting, attendance
+courses can created in advance even not yet knowing who will actually be part of the real course.
+The setting is controlled by the field _E5_ which has the value 1 in all course rows.
+
+If you do not want that, either empty _E5_ or set in the _E_ columns of the course "0" or simply
+remove the 1 (in the sample, this is cell _E8_).
+
+If you just want to copy the enrolments, you may change _E5_ to the value `copyparticipants`.
+
+### Attendance for groups
+
+The `Attendance_Groups.odt` template is very similar to the other template. However, for this
+use case the course that needs attendance tracking is visited by two (or more) groups. Each group
+must pass a certain amount of presence dates on which attendance must be confirmed. Each group
+of students has it's own dates.
+
+To make this work, from the original course, we create two attendance courses to track attendance
+of each group in a separate course. The template uses the same source course twice but with
+different attentance dates in each shadow course.
+
+In this template the shortname of the attendance courses must be set manually in the template
+(using the field definition in _E5_ and the values in _E8_ and _E20_). The link text from the main
+course to the attendance courses is also distinguished (field `link_new_course` in _H5_ with the
+two values in _H8_ and _H20_). Because of the different groups no automatic enrolment is done,
+hence the two attendence courses created will have no participants.
+
+From the 10 given dates for each group in the attendance courses 8 need to be attended to get the
+awarded badge.
+
+Apart from these changes, the rest of the template is very similar to the general template.
+
+After the import was done, in the original course, the students must be divided into two groups.
+The group members of each group need to be enroled in one of the new attendance courses. The two
+links from the main course to the attendance courses should get a access restriction set by group,
+so that each group gets to see their course only.
+
+### Troubleshooting during import
+
+In case of an error, the import is stopped for the single course. This is the case, if there is a
+problem with the `COURSE` line (e.g. source course not found) or in the subsequent process when
+an activity throws an error.
+
+The upload and import needs quite some memory for all it's operations. While memory is increased there
+still might be the chance that you run into  a 500 error during the upload and creation process. In
+this case, check manually which new courses have been created and delete these. Also delete
+any links in the original course that may point to the new created attendance course that you just
+deleted. Then split the file into smaller chunks and try again.
+
+#### Deleting a course
+
+If something goes wrong, you should consider to delete the new attendance course and start over again.
+This is the easiest way of dealing with incomplete imports and course creations.
+
+Course IDs can be easiliy checked in the log output. When there was a 500 error, the log does not
+exist and it must be checked via the course management in the admin area or simply by looking in
+the database course table and check for the highest ids e.g.
+
+```
+select id, shortname, fullname from course order by id desc limit 10;
+```
+
+Deleting a new course is easiest done on the cli (in case you have access to the server) by running:
+
+```
+sudo -u www-data php /path/to/your/moodle/admin/cli/delete_course.php -c=ID --disablerecyclebin
+```
+
+You may also use the course admin area but then have to navigate through the category structure to
+find your course which makes the process a bit more complicated.
