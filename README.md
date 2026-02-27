@@ -288,15 +288,15 @@ The badge may have the following fields:
 If a criteria is set for the badge, the following fields are needed:
 
 * `criteriatype` {string|int} name or value of the criteria constants which are:
-    * BADGE_CRITERIA_TYPE_ACTIVITY = 1
-    * BADGE_CRITERIA_TYPE_MANUAL = 2
-    * BADGE_CRITERIA_TYPE_SOCIAL = 3
-    * BADGE_CRITERIA_TYPE_COURSE = 4
-    * BADGE_CRITERIA_TYPE_COURSESET = 5
-    * BADGE_CRITERIA_TYPE_PROFILE = 6
-    * BADGE_CRITERIA_TYPE_BADGE = 7
-    * BADGE_CRITERIA_TYPE_COHORT = 8
-    * BADGE_CRITERIA_TYPE_COMPETENCY = 9
+    * BADGE_CRITERIA_TYPE_ACTIVITY or 1
+    * BADGE_CRITERIA_TYPE_MANUAL or 2
+    * BADGE_CRITERIA_TYPE_SOCIAL or 3
+    * BADGE_CRITERIA_TYPE_COURSE or 4
+    * BADGE_CRITERIA_TYPE_COURSESET or 5
+    * BADGE_CRITERIA_TYPE_PROFILE or 6
+    * BADGE_CRITERIA_TYPE_BADGE or 7
+    * BADGE_CRITERIA_TYPE_COHORT or 8
+    * BADGE_CRITERIA_TYPE_COMPETENCY or 9
 
 Depending on the criteria type, other fields must follow so that be badge criteria can be created
 successfully. Otherwise, the badge might be broken. The constants can also use lower case letters.
@@ -313,9 +313,9 @@ previous source course or the just created course is used.
 * `width` {int} image width, default 300.
 * `height` {int} image height, default 300.
 * `imagemode` {string|int} constants how to create the image:
-    * TEXT_ONLY = 0: create a square with the course short name, use a GD Font.
-    * TEXT_CHECKMARK = 1: create a square with a checkmark and the coure short name below using True Type Fonts.
-    * TEXT_TTF = 2: create a square with the course short name, use a True Type Font.
+    * TEXT_ONLY or 0: create a square with the course short name, use a GD Font.
+    * TEXT_CHECKMARK or 1: create a square with a checkmark and the coure short name below using True Type Fonts.
+    * TEXT_TTF or 2: create a square with the course short name, use a True Type Font.
 
 The so created image is used for the badge. Images can be changed later on in Moodle.
 
@@ -369,13 +369,13 @@ must be adjusted to use the correct date fields. In German the field content may
 
 Cells _F8_ and _F9_ are both for the completion criteria, e.g. how many times a student must
 tick the attendance to receive the badge for completion. This number depends on the number of
-dates below (in the template there are 17 from row 10 - 27) where a student may miss three
-ocurrences but is still rewarded the badge.
+dates below (in the template there are 18 from row 10 - 27) where a student may miss three
+occurrences but is still rewarded the badge.
 
 #### Additional files
 
 The badge image defined in _E8_ must be separately uploaded in the import form. The uploaded
-image name must be the same as in the templated. If the image cannot be found, the import is
+image name must be the same as in the template. If the image cannot be found, the import is
 skiped for this course.
 
 #### Participants
@@ -418,7 +418,68 @@ The group members of each group need to be enroled in one of the new attendance 
 links from the main course to the attendance courses should get a access restriction set by group,
 so that each group gets to see their course only.
 
-### Troubleshooting during import
+## Upload and import CSV
+
+The upload form is available at `https://your.moodle/local/attendance/index.php`. There are 3
+fields for the CSV file, a generic course suffix and the asset files.
+
+![Upload form](screenshots/upload_form.png "Screenshot with upload form")
+
+The first file manager is for the CSV file. The second file manager is for all asset files
+that might be referenced in the CSV file.
+
+The "Course generic suffix" is used for the short name and the full name of the new attendance
+course. If these are not defined in the CSV, the names are generic created based on the
+source course. For the short name of the new suffix the value is attached with
+a dash, while for the full name the suffix is put into brakets and attached with a space.
+If your original course has "Module 1a" as full name and "module-1a" short name and the provided
+value is "Attendance" in the upload form, the attendance course is named "Module 1a (Attendance)"
+and "module-1a-Attendance".
+
+Once the upload is complete the result is immediately displayed:
+
+![Import log](screenshots/result_log.png "Screenshot with import log")
+
+This is a partial content of the log from the previous screenshot:
+
+```
+Line 8: Course id: 263, name: "Cas test 2 (Attendance)" link: http://localhost:8000/course/view.php?id=263, additional info:
+Line 9: Badge name: "Attendance confirmation", link: http://localhost:8000/badges/overview.php?id=40, additional info:
+Line 10: Module quiz 602, name: "Confirmation of attendance 16.02.2026", link: http://localhost:8000/mod/quiz/view.php?id=2067, additional info: Password=veggok
+Line 11: Module quiz 603, name: "Confirmation of attendance 17.02.2026", link: http://localhost:8000/mod/quiz/view.php?id=2068, additional info: Password=wspokw
+Line 12: Module quiz 604, name: "Confirmation of attendance 23.02.2026", link: http://localhost:8000/mod/quiz/view.php?id=2069, additional info: Password=mzhphc
+Line 13: Module quiz 605, name: "Confirmation of attendance 03.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2070, additional info: Password=wohpuk
+Line 14: Module quiz 606, name: "Confirmation of attendance 09.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2071, additional info: Password=xtpuew
+Line 15: Module quiz 607, name: "Confirmation of attendance 10.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2072, additional info: Password=jyfdun
+Line 16: Module quiz 608, name: "Confirmation of attendance 16.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2073, additional info: Password=dahxwj
+Line 17: Module quiz 609, name: "Confirmation of attendance 17.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2074, additional info: Password=ztolzm
+Line 18: Module quiz 610, name: "Confirmation of attendance 23.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2075, additional info: Password=ncpmqm
+Line 19: Module quiz 611, name: "Confirmation of attendance 24.03.2026", link: http://localhost:8000/mod/quiz/view.php?id=2076, additional info: Password=otaale
+```
+
+**Note**: scrolling to the right, reveals the password for each quiz, that must be communicated
+to the course trainers.
+
+This result log might be improved, so that the result might be downloadable as CSV which makes it
+a lot easier to pass the information back to the trainers.
+
+### Errors and skipping lines
+
+In case of an error, the line is reported where the error occurred. The following screenshot contains
+two errors:
+
+![Import log with errors](screenshots/result_error_log.png "Screenshot with import log and errors")
+
+The first error in line 9 is because the referenced image was not uploaded with the CSV file or was
+uploaded under a different name. Because images are essential for badges, the badge was not created
+in the new course.
+
+In line 20 the error of a duplicate short name was found. This happens when a short name is already
+in use by another course. Because the new attendence course cannot be created, all subsequent lines
+that refer to the course, are skipped until the next `COURSE` line that indicates that a new course
+is being created.
+
+## Troubleshooting during import
 
 In case of an error, the import is stopped for the single course. This is the case, if there is a
 problem with the `COURSE` line (e.g. source course not found) or in the subsequent process when
@@ -430,7 +491,7 @@ this case, check manually which new courses have been created and delete these. 
 any links in the original course that may point to the new created attendance course that you just
 deleted. Then split the file into smaller chunks and try again.
 
-#### Deleting a course
+### Deleting a course
 
 If something goes wrong, you should consider to delete the new attendance course and start over again.
 This is the easiest way of dealing with incomplete imports and course creations.
