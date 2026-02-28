@@ -203,6 +203,9 @@ class import_handler {
                 }
             }
         }
+        if (empty($newSectionData)) {
+            return [];
+        }
         for ($i = 0; $i < max(\array_keys($newSectionData)) + 1; $i++) {
             if (!\array_key_exists($i, $newSectionData)) {
                 $newSectionData[$i] = '';
