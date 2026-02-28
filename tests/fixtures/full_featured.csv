@@ -1,0 +1,9 @@
+# Kommando,Moodle-Kurs Link,Kursname / Aktivityname / Badgename,Attendance from,Attendance until,Number to pass,Password (will be returned),Question text,Passwordrule
+COURSE_COLUMNS,source_course_short,,completion_criteria_date,copyparticipants,completion_criteria_grade,newsitems,link_new_course,link_new_course_section_position,section_name_1
+MODULE_COLUMNS,module,name,timeopen,timeclose,local_attendance_quiz_questiontext,local_attendance_quiz_passwordrule
+BADGE_COLUMNS,criteriatype,name,description,imagefile,grade
+COURSE,testcourse,General - Modul 1 DF a,2026-03-24 12:00:00,1,3,0,Go to attendance confirmation,1,Dates of Attendance
+BADGE,badge_criteria_type_course,Confirmation of Attendance,Required amount of attendances in course «General Modul 1 DF a» is fullfilled.,my-badge.png,3,2027-02-22 12:00:00
+MODULE,local_attendance_quiz,Attendance confirmation for 16.02.2027,2027-02-16 08:00:00,2027-02-16 12:00:00,Please confirm your attendance by replying yes,en
+MODULE,local_attendance_quiz,Attendance confirmation for 18.02.2027,2027-02-18 13:00:00,2027-02-18 17:00:00,Please confirm your attendance by replying yes,de
+MODULE,local_attendance_quiz,Attendance confirmation for 22.02.2027,2027-02-22 08:00:00,2027-02-22 12:00:00,Please confirm your attendance by replying yes,nato

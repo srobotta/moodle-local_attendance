@@ -1,0 +1,7 @@
+COURSE_COLUMNS;fullname;source_course_short
+MODULE_COLUMNS;module;name;timeopen;timeclose;local_attendance_quiz_questionname;local_attendance_quiz_questiontext
+BADGE_COLUMNS;criteriatype;grade;name
+COURSE;Test attendance;testcourse
+MODULE;local_attendance_quiz;Day 1 Attendance;2026-01-06 10:30:00;2026-01-06 10:40:00;Attendance;I was here.
+MODULE;local_attendance_quiz;Day 2 Attendance;2026-01-23 10:30:00;2026-01-23 10:40:00;Attendance;I was here.
+BADGE;BADGE_CRITERIA_TYPE_COURSE;2;Confirmation of attendance
