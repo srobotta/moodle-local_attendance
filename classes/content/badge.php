@@ -35,6 +35,7 @@ class badge extends modcreate {
 
     /**
      * Create the badge in the given course.
+     * @param array $data The data for creating the badge, including name, description, image parameters and criteria parameters.
      * @return \core_badges\badge The created badge.
      * @throws \moodle_exception
      */

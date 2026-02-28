@@ -41,8 +41,6 @@ class csv_import {
 
     private import_handler $handler;
     private upload_form $form;
-    private array $contentfiles = [];
-    private string $separator;
     private array $columns;
 
     private array $log;
@@ -50,7 +48,7 @@ class csv_import {
     /**
      * Constructor.
      * @param import_handler|null $handler
-     * @param string $separator
+     * @param upload_form|null $form
      */
     public function __construct(
         ?import_handler $handler = null,
@@ -92,7 +90,7 @@ class csv_import {
             if (str_starts_with($line, '#')) {
                 continue; // Skip comment lines.
             }
-            $fields = str_getcsv($line, $this->form->getCsvDelimiter());
+            $fields = str_getcsv($line, $this->form->getCsvDelimiter(), '"', '\\');
 
             if (!$this->isValidCommand($fields[0])) {
                 $this->log(get_string(
@@ -305,6 +303,7 @@ class csv_import {
 
     /**
      * Get the log messages.
+     * @param bool $errorsOnly If true, only return error messages. Otherwise, return all messages.
      * @return array The log messages.
      */
     public function getLog(bool $errorsOnly = false): array {

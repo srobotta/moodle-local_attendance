@@ -181,6 +181,8 @@ class badgeImage {
 
     /**
      * Apply text using TTF font.
+     * 
+     * @param int|float $fgColor The foreground color for the text.
      */
     protected function appyTextByTtf(int|float $fgColor) {
         global $CFG;
@@ -206,6 +208,7 @@ class badgeImage {
 
     /**
      * Apply text using GD built-in font.
+     * @param int|float $fgColor The foreground color for the text.
      */
     protected function applyTextByGd(int|float $fgColor) {
         // Use built-in font
