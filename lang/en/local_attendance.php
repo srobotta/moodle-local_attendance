@@ -69,3 +69,4 @@ $string['col_generalfeedback'] = 'Please answer yes if you attended the class.';
 
 $string['badge_defaultname'] = 'Attendance Badge';
 $string['badge_defaultdescription'] = 'This badge is awarded for attending the course {$a}.';
+$string['privacy:metadata'] = 'The Attendance course creator plugin does not store any personal data.';
