@@ -330,23 +330,23 @@ The `Attendance.odt` template contains basically our use case that was the motiv
 The lines starting with `#` are there for documentation, will be contained when saving a CSV but
 are ignored during the import.
 
-#### Predefined fields
+#### Colored fields
 
-Row _2_ and _3_ hold some predefinded data, that is used in the document later on in other cells. The
-fieldnames are in row _2_ as defined in the import, the actual values are in row _3_. In _C2_ the
-field name `link_new_course` is the explanation for field _C3_. This value is used in all
-`COURSE` rows in column _H_, with the field type defined in _H5_ (in the course columns). Likewise
-the question text for all attendance quizzes is taken from _B3_ (used in _H_ for all module columns).
+All the fields that have a background color are there to be modified by the user and filled with
+the individual values. Each field also has a comment, that explains a bit more in detail, what the
+content is used for.
+When copying lines, make sure that the formulas are copied correctly so that some autofilled fields
+have the correct value.
 
 #### Course and dates
 
 The course for which the attendance is required is defined
-in cell _B8_. Adapt the link to your course. In case if you want to use the short course name,
-change the cell _B5_ to `source_course_short` and enter the correct short name in _B8_.
+in cell _B6_. Adapt the link to your course. In case if you want to use the short course name,
+change the cell _B3_ to `source_course_short` and enter the correct short name in _B5_.
 
-The course name in _C8_ is not used for identifying the course. It is used as a reference for
+The course name in _C6_ is not used for identifying the course. It is used as a reference for
 the trainer to have a readable name of the course. However, the cell content is used in the
-cell _D9_ where the badge description is defined.
+cell _D7_ where the badge description is defined.
 
 The template is prefilled with some data that must be changed. Attendance dates are starting from
 row 10 with the `MODULE` command and the value `local_attendance_quiz` in column _B_ where the
@@ -367,33 +367,34 @@ must be adjusted to use the correct date fields. In German the field content may
 
 #### Completion criteria
 
-Cells _F8_ and _F9_ are both for the completion criteria, e.g. how many times a student must
+Cells _F6_ and _F7_ are both for the completion criteria, e.g. how many times a student must
 tick the attendance to receive the badge for completion. This number depends on the number of
-dates below (in the template there are 18 from row 10 - 27) where a student may miss three
-occurrences but is still rewarded the badge.
+dates below (in the template there are 3 from row 8 - 10) where in this case a student must
+not miss any of the occurrences. You can lower the number a bit to have the student miss
+an occurence of the coure but is still rewarded the badge.
 
 #### Additional files
 
-The badge image defined in _E8_ must be separately uploaded in the import form. The uploaded
+The badge image defined in _E7_ must be separately uploaded in the import form. The uploaded
 image name must be the same as in the template. If the image cannot be found, the import is
 skiped for this course.
 
 #### Participants
 
 To make things easy, the template assumes that your Moodle has the "Course meta enrolment" enabled
-so that students (ant teachers) are automatically enroled in the attendence course, when they
+so that students (and teachers) are automatically enroled in the attendence course, when they
 are enroled in the main course for which attendance is required. With this setting, attendance
 courses can created in advance even not yet knowing who will actually be part of the real course.
-The setting is controlled by the field _E5_ which has the value 1 in all course rows.
+The setting is controlled by the field _E3_ which has the value 1 in all course rows.
 
-If you do not want that, either empty _E5_ or set in the _E_ columns of the course "0" or simply
-remove the 1 (in the sample, this is cell _E8_).
+If you do not want that, either empty _E3_ or set in the _E_ columns of the course "0" or simply
+remove the 1 (in the sample, this is cell _E6_).
 
-If you just want to copy the enrolments, you may change _E5_ to the value `copyparticipants`.
+If you just want to copy the enrolments, you may change _E3_ to the value `copyparticipants`.
 
 ### Attendance for groups
 
-The `Attendance_Groups.odt` template is very similar to the other template. However, for this
+The `Attendance_Groups.odt` template is very similar to the `Attendance.odt` template. However, for this
 use case the course that needs attendance tracking is visited by two (or more) groups. Each group
 must pass a certain amount of presence dates on which attendance must be confirmed. Each group
 of students has it's own dates.
@@ -403,12 +404,12 @@ of each group in a separate course. The template uses the same source course twi
 different attentance dates in each shadow course.
 
 In this template the shortname of the attendance courses must be set manually in the template
-(using the field definition in _E5_ and the values in _E8_ and _E20_). The link text from the main
-course to the attendance courses is also distinguished (field `link_new_course` in _H5_ with the
-two values in _H8_ and _H20_). Because of the different groups no automatic enrolment is done,
-hence the two attendence courses created will have no participants.
+(values in _E6_ and _E12_). The link text from the main
+course to the attendance courses is also distinguished (fields _H6_ and _H12_). Because of
+the different groups no automatic enrolment is done, hence the two attendence courses created
+will have no participants.
 
-From the 10 given dates for each group in the attendance courses 8 need to be attended to get the
+From the 4 given dates for each group in the attendance courses 3 need to be attended to get the
 awarded badge.
 
 Apart from these changes, the rest of the template is very similar to the general template.
