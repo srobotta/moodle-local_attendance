@@ -16,6 +16,8 @@
 
 namespace local_attendance;
 
+use local_attendance\form\import_interface as form;
+
 /**
  * CSV import handler for courses and modules. Receives the csv file
  * reads it line by line and delegates the processing to the import_handler.
@@ -40,23 +42,21 @@ class csv_import {
     public const CMD_SKIP_LINE = 'SKIP_LINE';
 
     private import_handler $handler;
-    private upload_form $form;
+    private form $form;
     private array $columns;
 
     private array $log;
 
     /**
      * Constructor.
-     * @param import_handler|null $handler
-     * @param upload_form|null $form
+     * @param import_handler $handler
+     * @param form $form
      */
     public function __construct(
-        ?import_handler $handler = null,
-        ?upload_form $form = null,
+        import_handler $handler,
+        form $form,
     ) {
-        if ($handler !== null) {
-            $this->handler = $handler;
-        }
+        $this->handler = $handler;
         $this->form = $form;
         $this->columns = [];
         $this->log = [];

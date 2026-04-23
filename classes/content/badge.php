@@ -19,6 +19,8 @@ namespace local_attendance\content;
 use local_attendance\utils\utils;
 use local_attendance\modcreate;
 
+require_once($CFG->libdir . '/badgeslib.php');
+
 /**
  * Class to create badges with criteria in a given course.
  *

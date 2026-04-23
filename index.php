@@ -18,7 +18,7 @@ require_once('../../config.php');
 
 use local_attendance\csv_import;
 use local_attendance\import_handler;
-use local_attendance\upload_form;
+use local_attendance\form\upload as upload_form;
 
 global $OUTPUT, $USER, $PAGE, $CFG;
 

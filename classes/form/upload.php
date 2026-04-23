@@ -14,9 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local_attendance;
+namespace local_attendance\form;
 
+use local_attendance\csv_import;
 require_once($CFG->libdir . '/formslib.php');
+
 
 /**
  * Form for uploading CSV file for attendance course creation
@@ -25,7 +27,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class upload_form extends \moodleform {
+class upload extends \moodleform implements import_interface {
     /**
      * Path to uploaded CSV file.
      * @var string|null
