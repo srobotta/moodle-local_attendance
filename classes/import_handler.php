@@ -30,11 +30,28 @@ require_once($CFG->dirroot . '/course/edit_form.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_handler {
-
+    /**
+     * The course that the attendance course is created for.
+     * @var \stdClass|null
+     **/
     private ?\stdClass $sourceCourse = null;
+
+    /**
+     * The options from the form or CLI arguments.
+     * @var \stdClass|null
+     */
     private ?\stdClass $options = null;
+
+    /**
+     * The new attendance course that is created.
+     * @var \stdClass|null
+     **/
     private ?\stdClass $course = null;
 
+    /**
+     * Constructor.
+     * @param \stdClass|null $options
+     */
     public function __construct(?\stdClass $options = null) {
         if ($options !== null) {
             $this->options = $options;
@@ -95,10 +112,12 @@ class import_handler {
         $newData = $data;
         $this->useCourse($data);
         if (!\array_key_exists('shortname', $newData)) {
-            $newData['shortname'] = $this->course->shortname . '-' . $this->options->suffix;
+            $newData['shortname'] = $this->course->shortname
+                . '-' . ($this->options->suffix ?? time());
         }
         if (!\array_key_exists('name', $newData)) {
-            $newData['fullname'] = $this->course->fullname . ' (' . $this->options->suffix . ')';
+            $newData['fullname'] = $this->course->fullname
+                . ' (' . ($this->options->suffix ?? get_string('form_label_coursesuffix', 'local_attendance')) . ')';
         }
         // Fields that might be overwritten and are otherwise taken from the source course.
         $fieldsFromSource = ['category', 'visible', 'format', 'startdate', 'enddate'];
