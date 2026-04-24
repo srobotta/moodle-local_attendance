@@ -17,6 +17,11 @@ declare(strict_types=1);
 
 namespace local_attendance\utils;
 
+/**
+ * Utility class for path handling that is used for resolving the
+ * file arguments in the CLI context that they point to the correct
+ * location on the filessystem.
+ */
 class path {
     /**
      * Get the original current working directory, preferring
