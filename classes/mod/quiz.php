@@ -117,7 +117,27 @@ class quiz extends modcreate {
         // Get the course module instance.
         $this->cm = get_coursemodule_from_instance('quiz', $this->getId(), $this->course->id, false, MUST_EXIST);
         $this->moduleinfo->questionid = $this->addQuestion();
+        $this->assertGradable();
         return $this;
+    }
+
+    /**
+     * Setup correct grade item (must be the sum of all grade items in the course)
+     * to make sure the completion criteria based on grade work correctly.
+     */
+    protected function assertGradable(): void {
+        $gradeItem = \grade_item::fetch([
+            'courseid' => $this->course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'quiz',
+            'iteminstance' => $this->getId()
+        ], MUST_EXIST);
+        $gradeCat = $gradeItem->get_parent_category();
+        if ($gradeCat && (int)$gradeCat->aggregation !== GRADE_AGGREGATE_SUM) {
+            $gradeCat->aggregation = GRADE_AGGREGATE_SUM;
+            $gradeCat->update();
+            $gradeCat->pre_regrade_final_grades();
+        }
     }
 
     /**
