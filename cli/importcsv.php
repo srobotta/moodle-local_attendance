@@ -31,6 +31,7 @@ require_once($CFG->libdir . '/clilib.php');
 use local_attendance\form\cli as form;
 use local_attendance\csv_import;
 use local_attendance\import_handler;
+use local_attendance\utils\path;
 
 // Store here the CSV file to import.
 $csvFile = null;
@@ -74,25 +75,12 @@ if (empty($csvFile)) {
     cli_error('CSV file is required. Use --help for usage information.');
 }
 
-
 // Map filenames of content files and csv file.
-// Current working directory for resolving relative paths.
-$cwd = $_SERVER['PWD'] ?? '';
-echo "Current working directory: $cwd" . PHP_EOL;
-if (str_starts_with($csvFile, DIRECTORY_SEPARATOR) || substr($csvFile, 1, 2) === ':' . DIRECTORY_SEPARATOR) {
-    // Absolute path, do not prepend cwd.
-} else {
-    $csvFile = $cwd . DIRECTORY_SEPARATOR . $csvFile;
-}
+$csvFile = path::resolvePath($csvFile);
 $contentFiles = [];
 foreach ($files as $file) {
-    $fname = basename($file);        
-    if (str_starts_with($path, DIRECTORY_SEPARATOR) || substr($path, 1, 2) === ':' . DIRECTORY_SEPARATOR) {
-        // Absolute path, do not prepend cwd.
-        $contentFiles[$fname] = $file;
-    } else {
-        $contentFiles[$fname] = $cwd . DIRECTORY_SEPARATOR . $file;
-    }
+    $fname = basename($file);
+    $contentFiles[$fname] = path::resolvePath($file);
 }
 
 // Check if CSV file exists.
@@ -104,7 +92,7 @@ if (!file_exists($csvFile)) {
 $admin = get_admin();
 \core\session\manager::set_user($admin);
 
-$mform = new form($csvFile, $contentFiles, $options['suffix'] ?? null, $options['del'] ?? null, $cwd);
+$mform = new form($csvFile, $contentFiles, $options['suffix'] ?? null, $options['del'] ?? null);
 $importHandler = new import_handler((object)[
     'suffix' => $mform->getCourseSuffix(),
     'files' => $mform->getContentFiles(),
