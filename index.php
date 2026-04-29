@@ -43,6 +43,9 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'local_attendance'), 2);
 
 if ($mform->is_submitted() && $mform->is_validated()) {
+    // Importing the file and creating courses needs quite some ressources.
+    core_php_time_limit::raise();
+    raise_memory_limit(MEMORY_HUGE);
 
     $importHandler = new import_handler((object)[
         'suffix' => $mform->getCourseSuffix(),
