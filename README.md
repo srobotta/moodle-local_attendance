@@ -461,8 +461,42 @@ Line 19: Module quiz 611, name: "Confirmation of attendance 24.03.2026", link: h
 **Note**: scrolling to the right, reveals the password for each quiz, that must be communicated
 to the course trainers.
 
-This result log might be improved, so that the result might be downloadable as CSV which makes it
+### Get passwords from the log
+
+This result log might be improved, so that the result could be downloadable as CSV which makes it
 a lot easier to pass the information back to the trainers.
+
+For the moment being you may use the following command to extract the passwords and copy them manually
+into your Excel/CSV file (note that the line numbering is different, because only the passwords are
+extracted):
+
+```
+cat import.log | cut -d, -f 4 | sed -n 's/.*=\([[:alpha:]]\)/\1/p'
+```
+
+The regular expression in sed works for words only, e.g. if you use the password rule `en` or `de` for
+a language list, or `lower` and `alpha` for generic passwords with letters only.
+
+This command (with a Moodle in german because of the match "Kennwort") returns all lines in the
+exact order:
+
+```
+cat import.log | cut -d : -f 6 | while read l; do echo ${l/Kennwort=/ }; done
+```
+
+You might also extract the quiz ids and collect them in a separate file:
+
+```
+cat import.log | grep "mod/quiz" | cut -d : -f 2 | while read l ; do echo ${l:12:6}; done >> quizids.txt
+```
+
+and use the content of this file with all the quiz ids in a sql query:
+
+```
+select id, name, password from mdl_quiz where id in ( <filecontent> );
+```
+
+This selects the quiz id, the name (visible in the course) and the passwort in a list.
 
 ### Errors and skipping lines
 
@@ -479,6 +513,31 @@ In line 20 the error of a duplicate short name was found. This happens when a sh
 in use by another course. Because the new attendence course cannot be created, all subsequent lines
 that refer to the course, are skipped until the next `COURSE` line that indicates that a new course
 is being created.
+
+## CLI
+
+There is a cli command that does the same as the upload form. In order to use it you need to have access
+to the server via shell. The advantage is that you might circumvent server limits that are reached easily
+when importing and creating new courses.
+
+To import a file on the command line, you may run the following command:
+
+```
+php public/local/attendance/cli/importcsv.php -d=\; -s="attendance" courses.csv badge.png ...
+```
+
+The two argument switches are optional and are for:
+
+* `-d` the delimiter char (in the above example a ; - that need to be escaped with a backslash on
+   the command line)
+* `-s` the suffix for the course name (put into brakets or added via -).
+
+The first file must be the CSV file for the import. All other files provided at the import can
+be referenced by the filename (without the path) from within the CSV file.
+
+While the script supports absolute and relative paths, some PHP/Moodle configurations let this fail
+so that you must provide the absolute path to the file arguments in order that the script finds them
+on the file system.
 
 ## Troubleshooting during import
 
