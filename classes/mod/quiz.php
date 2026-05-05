@@ -93,7 +93,7 @@ class quiz extends modcreate {
             $data[$key] = utils::parseDateTime($key, $data);
         }
         // If the quiz password is not set, set a default one from a list.
-        if (empty($data['quizpassword'])) {
+        if (!isset($data['quizpassword'])) {
             $data['quizpassword'] = $this->getPassword();
         }
         // There should be a short limit for the quiz to avoid long attempts.

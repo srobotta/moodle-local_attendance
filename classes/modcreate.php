@@ -93,7 +93,7 @@ class modcreate implements modcreate_interface {
                 ->sectionnum;
             unset($data['sectionid']);
         } elseif (\array_key_exists('section', $data)) {
-            $sectionnum = (int)$data['section'] - 1;
+            $sectionnum = (int)$data['section'];
             if ($sectionnum < 0) { // Just in case someone puts section 0 in the csv of the field is empty.
                 $sectionnum = 0;
             }
