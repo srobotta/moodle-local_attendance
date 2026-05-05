@@ -131,7 +131,7 @@ class quiz extends modcreate {
             'itemtype' => 'mod',
             'itemmodule' => 'quiz',
             'iteminstance' => $this->getId()
-        ], MUST_EXIST);
+        ]);
         $gradeCat = $gradeItem->get_parent_category();
         if ($gradeCat && (int)$gradeCat->aggregation !== GRADE_AGGREGATE_SUM) {
             $gradeCat->aggregation = GRADE_AGGREGATE_SUM;

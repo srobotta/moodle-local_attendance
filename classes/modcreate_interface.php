@@ -37,7 +37,7 @@ interface modcreate_interface {
 
     /**
      * Create a new activity in the course.
-     * The parameter contains originally contains the associative array from
+     * The parameter contains the associative array from
      * the import file which might have been modiefied by the caller.
      * @param array $data
      * @return modcreate_interface

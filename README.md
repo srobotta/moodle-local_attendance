@@ -241,7 +241,8 @@ not set, it remains empty.
 not set, it remains empty.
 * `local_attendance_quiz_generalfeedback` the general feedback when the answer
 was submitted. If not set, a language string is used.
-* `local_attendance_quiz_passwordrule` the rule for randomly generated passwords.
+* `local_attendance_quiz_passwordrule` the rule for randomly generated passwords, if not
+set, `lower` is used.
 
 ### Quiz passwords
 
