@@ -379,7 +379,6 @@ final class modquiz_test extends \advanced_testcase {
      * Test placing quiz in a specific section by section id.
      */
     public function test_create_quiz_in_section_by_id(): void {
-        global $DB;
         // Create an additional section and get its id
         $section2 = $this->getDataGenerator()->create_course_section([
             'course' => $this->course->id,
@@ -408,7 +407,6 @@ final class modquiz_test extends \advanced_testcase {
      * Test placing quiz at a selected section and a specific position within a section.
      */
     public function test_create_quiz_at_section_and_position(): void {
-        global $DB;
         // Create a quiz first in section 0 (default)
         $this->runCsvTest([
             'module' => 'local_attendance_quiz',
