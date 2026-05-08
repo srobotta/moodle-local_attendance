@@ -118,6 +118,9 @@ class import_handler {
         if (!\array_key_exists('name', $newData)) {
             $newData['fullname'] = $this->course->fullname
                 . ' (' . ($this->options->suffix ?? get_string('form_label_coursesuffix', 'local_attendance')) . ')';
+        } else {
+            $newData['fullname'] = $newData['name'];
+            unset($newData['name']);
         }
         // Fields that might be overwritten and are otherwise taken from the source course.
         $fieldsFromSource = ['category', 'visible', 'format', 'startdate', 'enddate'];
@@ -302,11 +305,13 @@ class import_handler {
         }
         // Simple criteria value mapping
         foreach (['date', 'duration', 'grade'] as $criterium) {
-            if (\array_key_exists('completion_criteria_' . $criterium, $newData)) {
+            $keyCriterion = 'completion_criteria_' . $criterium;
+            if (\array_key_exists($keyCriterion, $newData)) {
                 $data['criteria_' . $criterium] = 1;
-                $data['criteria_' . $criterium . '_value'] = $criterium === 'date'
-                    ? utils::parseDateTime('completion_criteria_' . $criterium, $newData)
-                    : $newData['completion_criteria_' . $criterium];
+                $keyValue = 'criteria_' . $criterium . '_' . ($criterium === 'duration' ? 'days' :'value');
+                $data[$keyValue] = $criterium === 'date'
+                    ? utils::parseDateTime($keyCriterion, $newData)
+                    : $newData[$keyCriterion];
             }
         }
         foreach (['unenrol', 'self'] as $criterium) {
