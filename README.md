@@ -1,4 +1,6 @@
-# Moodle Plugin Attendance Course Creator
+[![ci](https://github.com/srobotta/moodle-local_attendance/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/srobotta/moodle-local_attendance/actions/workflows/ci.yml?branch=master)
+
+# Attendance Course Creator
 
 The use case for this plugin is to have automatically set up a course
 to check the student attendance by having them answer one question
