@@ -27,6 +27,19 @@ revealed during the presence time. Some teachers reported that the password
 for the test was given at the end of the presence time, to keep the students
 attention until the end of the event.
 
+![Original or source course](screenshots/source_course.png "Screenshot with source course")
+
+This is a screenshot of a fictional source/original course where attendance
+should be tracked. After the import (and depending of the file
+settings) a link to the attendance course is created so that the students can easlily
+navigate from their original course to the attendance course.
+
+![Attendance course](screenshots/attendance_course.png "Screenshot with attendance course")
+
+This is the attendance course, where the presence of the students is tracked.
+It only consists of quizzes that are open at the short presence time only (set
+via the import file).
+
 This plugin offers an upload form so that managers can prepare an import
 file with the course data to automatically create such courses. The plugin
 includes also templates in OpenOffice format that should make it easier to
