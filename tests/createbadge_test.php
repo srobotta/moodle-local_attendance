@@ -101,6 +101,32 @@ final class createbadge_test extends \advanced_testcase {
     }
 
     /**
+     * Helper method to check that the badge image was created correctly.
+     * @param \stdClass $badge The badge record from the database to check the image for.
+     */
+    protected function runBadgeImageTest(\stdClass $badge): void {
+        global $CFG;
+        $files = get_file_storage()->get_area_files(
+            \context_course::instance($badge->courseid)->id,
+            'badges',
+            'badgeimage',
+            $badge->id,
+            'id',
+            false
+        );
+        // There should be a generated image file with the source course shortname as caption.
+        $this->assertGreaterThan(0, count($files));
+        $sizes = [100, 35, 512];
+        foreach (\array_values($files) as $i => $file) {
+            $tempname = tempnam($CFG->tempdir, 'createbadge_test_badgeimage');
+            $file->copy_content_to($tempname);
+            [$w, $h] = getimagesize($tempname);
+            $this->assertEquals($sizes[$i], $w);
+            $this->assertEquals($sizes[$i], $h);
+        }
+    }
+
+    /**
      * Test creating a badge with default name and description.
      */
     public function test_create_badge_with_defaults(): void {
@@ -515,6 +541,7 @@ final class createbadge_test extends \advanced_testcase {
 
         $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
+        $this->runBadgeImageTest($badge);
     }
 
     /**
@@ -538,6 +565,7 @@ final class createbadge_test extends \advanced_testcase {
         $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
         $this->assertEquals('Fully Customized Badge', $badge->name);
+        $this->runBadgeImageTest($badge);
     }
 
     /**
