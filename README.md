@@ -4,7 +4,7 @@
 
 The use case for this plugin is to have automatically set up a course
 to check the student attendance by having them answer one question
-in a test activity to check for the students precense in the course.
+in a test activity to check for the students presence in the course.
 
 The plugin was developed in a generic matter, so that different
 activities can be created with it and that other use cases are possible
