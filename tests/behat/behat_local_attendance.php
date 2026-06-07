@@ -19,7 +19,6 @@ require_once(__DIR__ . '/../../../../repository/upload/tests/behat/behat_reposit
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\DriverException;
 use Behat\Mink\Exception\ExpectationException;
-use Behat\Step\When;
 
 /**
  * File upload in filemanager element with scroll definition.

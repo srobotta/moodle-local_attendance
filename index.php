@@ -24,15 +24,15 @@ global $OUTPUT, $USER, $PAGE, $CFG;
 
 $pageUrl = new moodle_url('/local/attendance/index.php');
 $context = context_system::instance();
+require_capability('local/attendance:view', $context);
+
 $PAGE->set_context($context);
 $PAGE->set_url($pageUrl);
 $PAGE->set_pagelayout('admin');
 
 if (!$course = get_site()) {
-    error("Could not find a top-level course!");
+    throw new \moodle_exception("Could not find a top-level course!");
 }
-
-require_login($course);
 
 $mform = new upload_form();
 

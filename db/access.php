@@ -15,18 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tool to create an attendance course with test activities and a badge for completion.
+ * Access file.
  *
  * @package   local_attendance
- * @copyright 2025 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @copyright 2026 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026051101; // The current module version (Date: YYYYMMDDXX)
-$plugin->requires  = 2025041400; // Requires this Moodle version.
-$plugin->component = 'local_attendance';
-$plugin->release = 'v5.2-r1';
-$plugin->supported = [500, 502];
-$plugin->maturity = MATURITY_STABLE;
+$capabilities = [
+    'local/attendance:view' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [],
+    ],
+];

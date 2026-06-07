@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['attendance:view'] = 'Access to Attendance Course Creator';
 $string['pluginname'] = 'Attendance Course Creator';
 $string['form_btn_import'] = 'Import';
 $string['form_label_uploadcsvfile'] = 'Upload CSV file';
