@@ -21,6 +21,10 @@ namespace local_attendance\utils;
  * Utility class for path handling that is used for resolving the
  * file arguments in the CLI context that they point to the correct
  * location on the filessystem.
+ *
+ * @package     local_attendance
+ * @copyright   2026 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class path {
     /**

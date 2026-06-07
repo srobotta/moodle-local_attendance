@@ -19,7 +19,7 @@ namespace local_attendance\content;
 /**
  * Class to generate badge images with text and a checkmark.
  *
- * @package     local_attendance\content
+ * @package     local_attendance
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -24,7 +24,7 @@ require_once($CFG->libdir . '/badgeslib.php');
 /**
  * Class to create badges with criteria in a given course.
  *
- * @package     local_attendance\content
+ * @package     local_attendance
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

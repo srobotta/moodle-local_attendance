@@ -20,7 +20,7 @@ namespace local_attendance\privacy;
  * Attendance this file handle privacy provider.
  *
  * @package          local_attendance
- * @author           Stephan Robotta <stephan.robotta@bfh.ch>
+ * @copyright        2026 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license          http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {

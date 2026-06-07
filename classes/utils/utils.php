@@ -21,7 +21,7 @@ use moodleform;
 /**
  * Utility functions for the attendance plugin.
  *
- * @package     local_attendance\utils
+ * @package     local_attendance
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
