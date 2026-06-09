@@ -31,7 +31,7 @@ class path {
      * Get the original current working directory, preferring
      * the preserved PWD environment variable if available.
      */
-    protected static function getOriginalCwd(): string {
+    protected static function get_original_cwd(): string {
         // Prefer preserved PWD (if sudo -E was used)
         $pwd = getenv('PWD');
         if ($pwd && is_dir($pwd)) {
@@ -46,7 +46,7 @@ class path {
      * @param string $path
      * @return string
      */
-    protected static function expandTilde(string $path): string {
+    protected static function expand_tilde(string $path): string {
         if ($path[0] !== '~') {
             return $path;
         }
@@ -71,7 +71,7 @@ class path {
      * @param string $path
      * @return string
      */
-    protected static function normalizePath(string $path): string {
+    protected static function normalize_path(string $path): string {
         $parts = [];
         $path = str_replace('\\', '/', $path);
 
@@ -94,25 +94,25 @@ class path {
      * @param string $input
      * @return string
      */
-    public static function resolvePath(string $input): string {
+    public static function resolve_path(string $input): string {
         // Check if its and absolute windows path, then return is as we don't want to mess with it.
         if (substr($input, 1, 2) === ':\\' || str_starts_with($input, '\\\\')) {
             return $input;
         }
 
         // Step 1: expand ~
-        $input = self::expandTilde($input);
+        $input = self::expand_tilde($input);
 
         // Step 2: absolute path?
         if (str_starts_with($input, '/')) {
             $path = $input;
         } else {
-            $cwd = self::getOriginalCwd();
+            $cwd = self::get_original_cwd();
             $path = $cwd . DIRECTORY_SEPARATOR . $input;
         }
 
         // Step 3: normalize (handles .. and .)
-        $path = self::normalizePath($path);
+        $path = self::normalize_path($path);
 
         // Step 4: resolve real path if it exists
         $real = realpath($path);

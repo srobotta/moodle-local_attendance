@@ -32,19 +32,19 @@ class cli implements import_interface {
      * CSV file from cli argument.
      * @var string|null
      */
-    private $csvFile;
+    private $csvfile;
 
     /**
      * Array of content files from cli argument.
      * @var array|null
      */
-    private $contentFiles;
+    private $contentfiles;
 
     /**
      * Course suffix from cli argument.
      * @var string|null
      */
-    private $courseSuffix;
+    private $coursesuffix;
 
     /**
      * CSV delimiter from cli argument.
@@ -56,15 +56,15 @@ class cli implements import_interface {
     /**
      * Constructor for CLI form. Initializes the form data based on the provided arguments.
      *
-     * @param string $csvFile Path to the CSV file to import.
-     * @param array|null $contentFiles Array of content files to be used in the import, with key = filename and value = path to temporary file.
-     * @param string|null $courseSuffix Optional course suffix to append to created courses.
+     * @param string $csvfile Path to the CSV file to import.
+     * @param array|null $contentfiles Array of content files to be used in the import, with key = filename and value = path to temporary file.
+     * @param string|null $coursesuffix Optional course suffix to append to created courses.
      * @param string|null $delimiter Optional CSV delimiter to use for parsing the CSV file.
      */
-    public function __construct(string $csvFile, ?array $contentFiles, ?string $courseSuffix, ?string $delimiter) {
-        $this->csvFile = $csvFile;
-        $this->contentFiles = $contentFiles;
-        $this->courseSuffix = $courseSuffix;
+    public function __construct(string $csvfile, ?array $contentfiles, ?string $coursesuffix, ?string $delimiter) {
+        $this->csvfile = $csvfile;
+        $this->contentfiles = $contentfiles;
+        $this->coursesuffix = $coursesuffix;
         $this->delimiter = $delimiter;
     }
 
@@ -72,7 +72,7 @@ class cli implements import_interface {
      * Get the CSV delimiter selected in the form.
      * @return string CSV delimiter.
      */
-    public function getCsvDelimiter(): string {
+    public function get_csv_delimiter(): string {
         return $this->delimiter ?? csv_import::DELIMITER_COMMA;
     }
 
@@ -80,8 +80,8 @@ class cli implements import_interface {
      * Get the course suffix entered in the form.
      * @return string Course suffix.
      */
-    public function getCourseSuffix(): string {
-        return $this->courseSuffix ?? get_string('form_value_coursesuffix', 'local_attendance');
+    public function get_course_suffix(): string {
+        return $this->coursesuffix ?? get_string('form_value_coursesuffix', 'local_attendance');
     }
 
     /**
@@ -90,9 +90,9 @@ class cli implements import_interface {
      *
      * @return array Array of stored_file objects.
      */
-    public function getContentFiles(): array {
-        if ($this->contentFiles !== null) {
-            return $this->contentFiles;
+    public function get_content_files(): array {
+        if ($this->contentfiles !== null) {
+            return $this->contentfiles;
         }
         return [];
     }
@@ -101,15 +101,15 @@ class cli implements import_interface {
      * Get the path to the uploaded CSV file.
      * @return string Path to temporary CSV file.
      */
-    public function getCsvFile(): string {
-        return $this->csvFile;
+    public function get_csv_file(): string {
+        return $this->csvfile;
     }
 
     /**
      * Cleanup temporary files created during upload.
      * @return void
      */
-    public function cleanupFiles(): void {
+    public function cleanup_files(): void {
         // No temporary files to clean up in CLI context.
     }
 }

@@ -65,10 +65,10 @@ class badge extends modcreate {
             );
         }
         // Thow an error if there is an invalid criteriatype given.
-        $criteriaType = -1;
+        $criteriatype = -1;
         if (\array_key_exists('criteriatype', $this->row)) {
-            $criteriaType = $this->getConstantForCriteriaType($this->row['criteriatype']);
-            if ($criteriaType === -1) {
+            $criteriatype = $this->get_constant_for_criteria_type($this->row['criteriatype']);
+            if ($criteriatype === -1) {
                 $a = [
                     'value' => $this->row['criteriatype'],
                     'column' => 'criteriatype'
@@ -78,7 +78,7 @@ class badge extends modcreate {
         }
         // Collect all possible fields from the badge form.
         $form = new \core_badges\form\badge('', $data);
-        $formdata = utils::mergeData($form, $data);
+        $formdata = utils::merge_data($form, $data);
         $this->badge = \badge::create_badge($formdata, $this->course->id);
         // Create badge image. In the form the image is mandatory, so we create one here.
         if (\array_key_exists('imagefile', $data)) {
@@ -89,22 +89,22 @@ class badge extends modcreate {
             \process_new_icon($this->badge->get_context(), 'badges', 'badgeimage', $this->badge->id, $data['imagefile']);
         } else {
             // Create image based on given parameters.
-            $img = new badgeImage(
+            $img = new badge_image(
                 $data['imagecaption'] ?? '',
-                $data['bgcolor'] ?? badgeImage::DEFAULT_BGCOLOR,
-                $data['fgcolor'] ?? badgeImage::DEFAULT_FGCOLOR,
-                $data['width'] ?? badgeImage::DEFAULT_WIDTH,
-                $data['height'] ?? badgeImage::DEFAULT_HEIGHT,
-                $data['imagemode'] ?? badgeImage::TEXT_CHECKMARK
+                $data['bgcolor'] ?? badge_image::DEFAULT_BGCOLOR,
+                $data['fgcolor'] ?? badge_image::DEFAULT_FGCOLOR,
+                $data['width'] ?? badge_image::DEFAULT_WIDTH,
+                $data['height'] ?? badge_image::DEFAULT_HEIGHT,
+                $data['imagemode'] ?? badge_image::TEXT_CHECKMARK
             );
             $imgFile = $CFG->tempdir . '/local_attendance_badge_' . time() . '.png';
-            $img->getImageBlob($imgFile);
+            $img->get_image_blob($imgFile);
             \badges_process_badge_image($this->badge, $imgFile);
         }
 
-        if ($criteriaType !== -1) {
+        if ($criteriatype !== -1) {
             // Add criteria if specified in the current row.
-            $this->addCriteria($criteriaType);
+            $this->add_criteria($criteriatype);
         }
         if (!\array_key_exists('badgedisable', $this->row)) {
             // Enable the badge.
@@ -115,25 +115,25 @@ class badge extends modcreate {
 
     /**
      * Add criteria to the created badge, taken from the input data.
-     * @param int $criteriaType
+     * @param int $criteriatype
      * @throws \moodle_exception
      */
-    public function addCriteria(int $criteriaType): void {
+    public function add_criteria(int $criteriatype): void {
         $context = $this->badge->get_context();
         require_capability('moodle/badges:configurecriteria', $context);
         $params = [
-            'criteriatype' => $criteriaType,
+            'criteriatype' => $criteriatype,
             'badgeid' => $this->badge->id,
             'course' => $this->course->id,
         ];
 
         // If this is the first criteria added, we also need to add the overall criteria.
         if (count($this->badge->criteria) === 0) {
-            $criteriaOverall = \award_criteria::build([
+            $criteriaoverall = \award_criteria::build([
                 'criteriatype' => BADGE_CRITERIA_TYPE_OVERALL,
                 'badgeid' => $this->badge->id,
             ]);
-            $criteriaOverall->save(['agg' => BADGE_CRITERIA_AGGREGATION_ALL]);
+            $criteriaoverall->save(['agg' => BADGE_CRITERIA_AGGREGATION_ALL]);
         }
 
         // Add specific criteria to the badge.
@@ -144,7 +144,7 @@ class badge extends modcreate {
             }
         }
         if (isset($this->row['description'])) {
-            $params['description'] = utils::getTextAndFormat($this->row['description']);
+            $params['description'] = utils::get_text_and_format($this->row['description']);
         }
         if ($criteria instanceof \award_criteria_courseset) {
             $id = $criteria->add_courses([$this->course->id]);
@@ -163,7 +163,7 @@ class badge extends modcreate {
      * @return int The constant value for the criteria type.
      * @throws \moodle_exception If the criteria type is invalid.
      */
-    public function getConstantForCriteriaType(string|int $type): int {
+    public function get_constant_for_criteria_type(string|int $type): int {
         if (is_int($type)) {
             return $type;
         }
@@ -178,7 +178,7 @@ class badge extends modcreate {
      * Get the created badge.
      * @return \core_badges\badge
      */
-    public function getBadge(): \core_badges\badge {
+    public function get_badge(): \core_badges\badge {
         return $this->badge;
     }
 
@@ -186,21 +186,21 @@ class badge extends modcreate {
      * Get the URL to the created module.
      * @return string
      */
-    public function getUrl(): string {
-        return (new \moodle_url('/badges/overview.php', ['id' => $this->getId()]))->out();
+    public function get_url(): string {
+        return (new \moodle_url('/badges/overview.php', ['id' => $this->get_id()]))->out();
     }
 
     /** 
      * Get the display name of the created module.
      */
-    public function getName(): string {
-        return $this->getBadge()->name;
+    public function get_name(): string {
+        return $this->get_badge()->name;
     }
 
     /**
      * Get the instance ID of the created module.
      */
-    public function getCmId(): int {
+    public function get_cm_id(): int {
         return 0; // Badges do not have course modules.
     }
 
@@ -208,15 +208,15 @@ class badge extends modcreate {
      * Get the instance ID of the created module.
      * @return int
      */
-    public function getId(): int {
-        return (int)$this->getBadge()->id;
+    public function get_id(): int {
+        return (int)$this->get_badge()->id;
     }
 
     /**
      * Get the technical module name of the created module.
      * @return string
      */
-    public function getEntityName(): string {
+    public function get_entity_name(): string {
         return 'badge';
     }
 
@@ -225,7 +225,7 @@ class badge extends modcreate {
      * The returned string should be something like a JSON object or key=value pairs.
      * @return string
      */
-    public function getAdditionalData(): string {
+    public function get_additional_data(): string {
         return ''; // No additional data by default.
     }
 }

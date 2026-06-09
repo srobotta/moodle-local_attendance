@@ -59,11 +59,11 @@ final class modquiz_test extends \advanced_testcase {
      * @param array $csvrow The CSV row to use for creating the quiz.
      * @return array An array containing the created mod_quiz object, the quiz record, and the course module.
      */
-    protected function runCsvTest(array $csvrow): array {
+    protected function run_csv_test(array $csvrow): array {
         global $DB;
         $modquiz = new mod\quiz();
-        $log = $modquiz->useCourse($this->course)->setRow($csvrow)->create($csvrow);
-        $quiz = $DB->get_record('quiz', ['id' => $log->getId()], '*', MUST_EXIST);
+        $log = $modquiz->use_course($this->course)->set_row($csvrow)->create($csvrow);
+        $quiz = $DB->get_record('quiz', ['id' => $log->get_id()], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('quiz', $quiz->id, $this->course->id);
         return [$log, $quiz, $cm];
     }
@@ -75,7 +75,7 @@ final class modquiz_test extends \advanced_testcase {
      * @param \stdClass $cm The course module object.
      * @return array The list of questions.
      */
-    protected function getQuestions(
+    protected function get_questions(
         \stdClass $quiz,
         \stdClass $cm,
     ): array {
@@ -96,8 +96,8 @@ final class modquiz_test extends \advanced_testcase {
             'timeopen' => '2026-01-06 10:30:00',
             'timeclose' => '2026-01-06 10:40:00',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
-        $this->assertEquals('Day 1 Attendance', $log->getName());
+        [$log, $quiz] = $this->run_csv_test($csvrow);
+        $this->assertEquals('Day 1 Attendance', $log->get_name());
         $this->assertEquals('Day 1 Attendance', $quiz->name);
         $this->assertEquals(60, $quiz->timelimit);
         $this->assertEquals(strtotime('2026-01-06 10:30:00'), $quiz->timeopen);
@@ -119,13 +119,13 @@ final class modquiz_test extends \advanced_testcase {
             'local_attendance_quiz_questionname' => 'Attendance',
             'local_attendance_quiz_questiontext' => '<p class="alert alert-info">I was present</p>',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
         $this->assertEquals('Some Attendance 2', $quiz->name);
         $this->assertEquals(120, $quiz->timelimit);
         // Load nato word list and check password is from that list.
         $nato = explode("\n", file_get_contents(__DIR__ . '/../wordlist/nato.csv'));
         $this->assertContains($quiz->password, $nato);
-        $questions = $this->getQuestions($quiz, $cm);
+        $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
         $this->assertEquals('Attendance', $question->name);
@@ -145,7 +145,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'quizpassword' => 'mypassword',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals('mypassword', $quiz->password);
     }
 
@@ -160,7 +160,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'quizpassword' => '',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals('', $quiz->password);
     }
 
@@ -175,7 +175,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'lower',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(6, strlen($quiz->password));
         $this->assertMatchesRegularExpression('/^[a-z]{6}$/', $quiz->password);
     }
@@ -191,7 +191,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'alpha',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(6, strlen($quiz->password));
         $this->assertMatchesRegularExpression('/^[a-zA-Z]{6}$/', $quiz->password);
     }
@@ -207,7 +207,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'alnum',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(6, strlen($quiz->password));
         $this->assertMatchesRegularExpression('/^[a-zA-Z0-9]{6}$/', $quiz->password);
     }
@@ -223,7 +223,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'all',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(6, strlen($quiz->password));
         // Check that password contains at least one special character or digit
         $this->assertMatchesRegularExpression('/[!@#$%&*()_+\-={}[\]|:;<>,.?\/]*/', $quiz->password);
@@ -240,7 +240,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'en',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $en = explode("\n", file_get_contents(__DIR__ . '/../wordlist/en.csv'));
         $this->assertContains($quiz->password, $en);
     }
@@ -256,7 +256,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'de',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $de = explode("\n", file_get_contents(__DIR__ . '/../wordlist/de.csv'));
         $this->assertContains($quiz->password, $de);
     }
@@ -272,7 +272,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'color',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $color = explode("\n", file_get_contents(__DIR__ . '/../wordlist/color.csv'));
         $this->assertContains($quiz->password, $color);
     }
@@ -288,7 +288,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'local_attendance_quiz_passwordrule' => 'capital',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $capital = explode("\n", file_get_contents(__DIR__ . '/../wordlist/capital.csv'));
         $this->assertContains($quiz->password, $capital);
     }
@@ -306,8 +306,8 @@ final class modquiz_test extends \advanced_testcase {
             'local_attendance_quiz_answer_yes' => 'Yes, I was there',
             'local_attendance_quiz_answer_no' => 'No, I was absent',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
-        $questions = $this->getQuestions($quiz, $cm);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
+        $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
         // Get the question options to check the answers
@@ -338,8 +338,8 @@ final class modquiz_test extends \advanced_testcase {
             'local_attendance_quiz_feedback_no' => 'Sorry you could <em>not</em> attend.',
             'local_attendance_quiz_generalfeedback' => 'This quiz is for attendance tracking.',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
-        $questions = $this->getQuestions($quiz, $cm);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
+        $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
         // Check general feedback
@@ -369,7 +369,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'section' => '2',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
         $modinfo = get_fast_modinfo($this->course);
         $section = $modinfo->get_section_info_by_id($cm->section);
         $this->assertEquals(2, $section->sectionnum);
@@ -392,7 +392,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
             'sectionid' => (string)$section2->id,
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
         $sections = \course_modinfo::get_array_of_activities($this->course);
         foreach ($sections as $section) {
             if ($section->sectionid == $cm->section) {
@@ -408,7 +408,7 @@ final class modquiz_test extends \advanced_testcase {
      */
     public function test_create_quiz_at_section_and_position(): void {
         // Create a quiz first in section 0 (default)
-        $this->runCsvTest([
+        $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'First Quiz',
             'timeopen' => '2026-01-06 10:20:00',
@@ -416,7 +416,7 @@ final class modquiz_test extends \advanced_testcase {
         ]);
 
         // Create a quiz in section 1 (default position)
-        $this->runCsvTest([
+        $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'Second Quiz',
             'section' => '1',
@@ -425,7 +425,7 @@ final class modquiz_test extends \advanced_testcase {
         ]);
 
         // Create another quiz at position 1 (should be before the previous quiz)
-        [$log, $quiz, $cm] = $this->runCsvTest([
+        [$log, $quiz, $cm] = $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'Third Quiz',
             'timeopen' => '2026-01-06 11:30:00',
@@ -453,7 +453,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-02-06 10:40:00',
             'section' => '2',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow3);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow3);
         // Fetch module info again to get updated section info
         $modinfo = get_fast_modinfo($this->course);
         $section2modules = $modinfo->get_sections()[2] ?? [];
@@ -481,7 +481,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
         ];
         $modquiz = new mod\quiz();
-        $modquiz->useCourse($this->course)->setRow($csvrow)->create($csvrow);
+        $modquiz->use_course($this->course)->set_row($csvrow)->create($csvrow);
 
         // Reload course and check format
         $this->course = get_course($this->course->id);
@@ -506,7 +506,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
         ];
         $modquiz = new mod\quiz();
-        $modquiz->useCourse($this->course)->setRow($csvrow)->create($csvrow);
+        $modquiz->use_course($this->course)->set_row($csvrow)->create($csvrow);
 
         // Reload course and check completion
         $this->course = get_course($this->course->id);
@@ -523,7 +523,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeopen' => '2026-01-06 10:30:00',
             'timeclose' => '2026-01-06 10:40:00',
         ];
-        [$log, $quiz] = $this->runCsvTest($csvrow);
+        [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(1.0, $quiz->grade);
         $this->assertEquals(1.0, $quiz->sumgrades);
     }
@@ -538,8 +538,8 @@ final class modquiz_test extends \advanced_testcase {
             'timeopen' => '2026-01-06 10:30:00',
             'timeclose' => '2026-01-06 10:40:00',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
-        $questions = $this->getQuestions($quiz, $cm);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
+        $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
         $this->assertEquals(1.0, $question->defaultmark);
@@ -555,8 +555,8 @@ final class modquiz_test extends \advanced_testcase {
             'timeopen' => '2026-01-06 10:30:00',
             'timeclose' => '2026-01-06 10:40:00',
         ];
-        [$log, $quiz, $cm] = $this->runCsvTest($csvrow);
-        $questions = $this->getQuestions($quiz, $cm);
+        [$log, $quiz, $cm] = $this->run_csv_test($csvrow);
+        $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
         // Check that question name and text are not empty (they should have default values)
@@ -582,7 +582,7 @@ final class modquiz_test extends \advanced_testcase {
                 'timeclose' => '2026-01-06 10:40:00',
                 'local_attendance_quiz_passwordrule' => 'alnum',
             ];
-            [$log, $quiz] = $this->runCsvTest($csvrow);
+            [$log, $quiz] = $this->run_csv_test($csvrow);
             // Check that password doesn't contain confusing pairs
             $confusingPairs = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
             foreach ($confusingPairs as $pair) {

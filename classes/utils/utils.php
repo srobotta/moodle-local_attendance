@@ -31,7 +31,7 @@ class utils {
      * @param string $input
      * @return array ['text' => string, 'format' => int]
      */
-    public static function getTextAndFormat(string $input): array {
+    public static function get_text_and_format(string $input): array {
         // Default format is plain.
         $format = FORMAT_PLAIN;
         if (!empty(trim($input))) {
@@ -52,15 +52,15 @@ class utils {
      * @param array $data
      * @return \stdClass
      */
-    public static function mergeData(moodleform $mform, array $data): \stdClass {
-        $genericForm = new generic_form($mform);
-        $formData = $genericForm->get_fields();
+    public static function merge_data(moodleform $mform, array $data): \stdClass {
+        $genericform = new generic_form($mform);
+        $formdata = $genericform->get_fields();
         foreach ($data as $key => $value) {
-            if (property_exists($formData, $key)) {
-                $formData->{$key} = $value;    
+            if (property_exists($formdata, $key)) {
+                $formdata->{$key} = $value;    
             }
         }
-        return $formData;
+        return $formdata;
     }
 
     /**
@@ -70,7 +70,7 @@ class utils {
      * @param array $data The data array containing the value.
      * @return int
      */
-    public static function anyOrAll(string $key, array $data): int {
+    public static function any_or_all(string $key, array $data): int {
         if (!\array_key_exists($key, $data) || empty(trim((string)$data[$key]))) {
             return COMPLETION_AGGREGATION_ALL;
         }
@@ -96,7 +96,7 @@ class utils {
      * @return int The timestamp.
      * @throws \moodle_exception If the value cannot be parsed.
      */
-    public static function parseDateTime(string $key, array $data): int {
+    public static function parse_datetime(string $key, array $data): int {
         $strVal = trim($data[$key]);
         $intVal = (int)$data[$key];
         if ((string)$intVal === $strVal) {
@@ -123,7 +123,7 @@ class utils {
      * @param array $data The data array representing the CSV row
      * @return bool True if option is enabled, false otherwise.
      */
-    public static function isSetAndEnabled(string $key, array $data): bool {
+    public static function is_set_and_enabled(string $key, array $data): bool {
         if (!\array_key_exists($key, $data)) {
             return false;
         }

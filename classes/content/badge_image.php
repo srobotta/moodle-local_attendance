@@ -23,7 +23,7 @@ namespace local_attendance\content;
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class badgeImage {
+class badge_image {
     /**
      * Text modes for the badge image.
      */
@@ -102,7 +102,7 @@ class badgeImage {
         $this->fgcolor = $fgcolor;
         $this->width = $width;
         $this->height = $height;
-        $this->mode = $this->getConstantForMode($mode);
+        $this->mode = $this->get_constant_for_mode($mode);
     }
 
     /**
@@ -110,7 +110,7 @@ class badgeImage {
      * @param string $hex
      * @return array<int>
      */
-    protected function hexToRgb($hex) {
+    protected function hex2rgb($hex) {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
             $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
@@ -129,7 +129,7 @@ class badgeImage {
      * @return int The constant value for the image mode.
      * @throws \moodle_exception If the image mode is invalid.
      */
-    public function getConstantForMode(string|int $mode): int {
+    public function get_constant_for_mode(string|int $mode): int {
         if (is_int($mode)) {
             return $mode;
         }
@@ -143,7 +143,7 @@ class badgeImage {
     /**
      * Apply checkmark and text to the image using TTF fonts (FontAwesome for checkmark).
      */
-    protected function applyCheckAndText() {
+    protected function apply_check_and_text() {
         global $CFG;
         // Enable anti-aliasing
         imageantialias($this->image, true);
@@ -151,105 +151,105 @@ class badgeImage {
         $white = imagecolorallocate($this->image, 255, 255, 255);
 
         // Use a TTF font
-        $faFont = $CFG->libdir . "/fonts/fa-solid-900.ttf";
-        $textFont = $CFG->libdir . "/default.ttf";
+        $fafont = $CFG->libdir . "/fonts/fa-solid-900.ttf";
+        $textfont = $CFG->libdir . "/default.ttf";
 
         // Font Awesome checkmark (Unicode)
         $check = "\u{f00c}"; // FontAwesome check icon
 
         // ----- Draw Checkmark -----
-        $checkSize = 120;
-        $bbox = imagettfbbox($checkSize, 0, $faFont, $check);
-        $checkWidth = $bbox[2] - $bbox[0];
+        $checksize = 120;
+        $bbox = imagettfbbox($checksize, 0, $fafont, $check);
+        $checkwidth = $bbox[2] - $bbox[0];
 
-        $checkX = floor(($this->width - $checkWidth) / 2);
-        $checkY = 130;
+        $checkx = floor(($this->width - $checkwidth) / 2);
+        $checky = 130;
 
-        imagettftext($this->image, $checkSize, 0, $checkX, $checkY, $white, $faFont, $check);
+        imagettftext($this->image, $checksize, 0, $checkx, $checky, $white, $fafont, $check);
 
         // ----- Draw Text -----
-        $textSize = 28;
-        $bbox2 = imagettfbbox($textSize, 0, $textFont, $this->text);
+        $textsize = 28;
+        $bbox2 = imagettfbbox($textsize, 0, $textfont, $this->text);
         $textWidth = $bbox2[2] - $bbox2[0];
 
-        $textX = floor(($this->width - $textWidth) / 2);
-        $textY = 220;
+        $textx = floor(($this->width - $textWidth) / 2);
+        $texty = 220;
 
-        imagettftext($this->image, $textSize, 0, $textX, $textY, $white, $textFont, $this->text);
+        imagettftext($this->image, $textsize, 0, $textx, $texty, $white, $textfont, $this->text);
     
     }
 
     /**
      * Apply text using TTF font.
      * 
-     * @param int|float $fgColor The foreground color for the text.
+     * @param int|float $fgcolor The foreground color for the text.
      */
-    protected function appyTextByTtf(int|float $fgColor) {
+    protected function appy_text_by_ttf(int|float $fgcolor) {
         global $CFG;
         // Enable anti-aliasing
         imageantialias($this->image, true);
 
         // Use a TTF font
         $font = $CFG->libdir . "/default.ttf";
-        $fontSize = 48;
+        $fontsize = 48;
 
         // Get text size
-        $bbox = imagettfbbox($fontSize, 0, $font, $this->text);
-        $textWidth  = $bbox[2] - $bbox[0];
-        $textHeight = $bbox[1] - $bbox[7];
+        $bbox = imagettfbbox($fontsize, 0, $font, $this->text);
+        $textwidth  = $bbox[2] - $bbox[0];
+        $textheight = $bbox[1] - $bbox[7];
 
         // Center the text
-        $x = floor(($this->width - $textWidth) / 2);
-        $y = floor(($this->height + $textHeight) / 2);
+        $x = floor(($this->width - $textwidth) / 2);
+        $y = floor(($this->height + $textheight) / 2);
 
         // Draw the text
-        imagettftext($this->image, $fontSize, 0, $x, $y, $fgColor, $font, $this->text);
+        imagettftext($this->image, $fontsize, 0, $x, $y, $fgcolor, $font, $this->text);
     }
 
     /**
      * Apply text using GD built-in font.
      * @param int|float $fgColor The foreground color for the text.
      */
-    protected function applyTextByGd(int|float $fgColor) {
+    protected function apply_text_by_gd(int|float $fgcolor) {
         // Use built-in font
         $font = 4; // Built-in font size (1-5)
-        $textWidth = imagefontwidth($font) * strlen($this->text);
-        $textHeight = imagefontheight($font);
+        $textwidth = imagefontwidth($font) * strlen($this->text);
+        $textheight = imagefontheight($font);
 
         // Center the text
-        $x = floor(($this->width - $textWidth) / 2);
-        $y = floor(($this->height - $textHeight) / 2);
+        $x = floor(($this->width - $textwidth) / 2);
+        $y = floor(($this->height - $textheight) / 2);
 
         // Draw the text
-        imagestring($this->image, $font, $x, $y, $this->text, $fgColor);
+        imagestring($this->image, $font, $x, $y, $this->text, $fgcolor);
     }
 
     /**
      * Generate the badge image.
      */
-    public function generateImage() {
-        $bg = $this->hexToRgb($this->bgcolor);
-        $fg = $this->hexToRgb($this->fgcolor);
+    public function generate_image() {
+        $bg = $this->hex2rgb($this->bgcolor);
+        $fg = $this->hex2rgb($this->fgcolor);
 
         // Create image
         $this->image = imagecreatetruecolor($this->width, $this->height);
 
         // Allocate colors
-        $bgColor = imagecolorallocate($this->image, $bg[0], $bg[1], $bg[2]);
-        $fgColor = imagecolorallocate($this->image, $fg[0], $fg[1], $fg[2]);
+        $bgcolor = imagecolorallocate($this->image, $bg[0], $bg[1], $bg[2]);
+        $fgcolor = imagecolorallocate($this->image, $fg[0], $fg[1], $fg[2]);
 
         // Fill background
-        imagefill($this->image, 0, 0, $bgColor);
+        imagefill($this->image, 0, 0, $bgcolor);
 
         switch ($this->mode) {
             case self::TEXT_CHECKMARK:
-                $this->applyCheckAndText();
+                $this->apply_check_and_text();
                 break;
             case self::TEXT_TTF:
-                $this->appyTextByTtf($fgColor);
+                $this->appy_text_by_ttf($fgcolor);
                 break;
             default:
-                $this->applyTextByGd($fgColor);
+                $this->apply_text_by_gd($fgcolor);
         }
     }
 
@@ -258,9 +258,9 @@ class badgeImage {
      * @param string $filename If given, save the image to this file.
      * @return string|null The PNG image blob or null if saved to file.
      */
-    public function getImageBlob(string $filename = ''): ?string {
+    public function get_image_blob(string $filename = ''): ?string {
         if (!isset($this->image)) {
-            $this->generateImage();
+            $this->generate_image();
         }
         if ($filename !== '') {
             imagepng($this->image, $filename);

@@ -34,7 +34,7 @@ class import_handler {
      * The course that the attendance course is created for.
      * @var \stdClass|null
      **/
-    private ?\stdClass $sourceCourse = null;
+    private ?\stdClass $sourcecourse = null;
 
     /**
      * The options from the form or CLI arguments.
@@ -66,7 +66,7 @@ class import_handler {
      * @return \stdClass
      * @throws \moodle_exception
      */
-    public function useCourse(array $data): \stdClass {
+    public function use_course(array $data): \stdClass {
         global $CFG, $DB;
         if (\array_key_exists('source_course_id', $data)) {
             $this->course = get_course($data['source_course_id']);
@@ -107,100 +107,100 @@ class import_handler {
      * @return \stdClass
      * @throws \moodle_exception
      */
-    public function createCourse(array $data): \stdClass {
+    public function create_course(array $data): \stdClass {
         global $CFG;
-        $newData = $data;
-        $this->useCourse($data);
-        if (!\array_key_exists('shortname', $newData)) {
-            $newData['shortname'] = $this->course->shortname
+        $newdata = $data;
+        $this->use_course($data);
+        if (!\array_key_exists('shortname', $newdata)) {
+            $newdata['shortname'] = $this->course->shortname
                 . '-' . ($this->options->suffix ?? time());
         }
-        if (!\array_key_exists('name', $newData)) {
-            $newData['fullname'] = $this->course->fullname
+        if (!\array_key_exists('name', $newdata)) {
+            $newdata['fullname'] = $this->course->fullname
                 . ' (' . ($this->options->suffix ?? get_string('form_label_coursesuffix', 'local_attendance')) . ')';
         } else {
-            $newData['fullname'] = $newData['name'];
-            unset($newData['name']);
+            $newdata['fullname'] = $newdata['name'];
+            unset($newdata['name']);
         }
         // Fields that might be overwritten and are otherwise taken from the source course.
-        $fieldsFromSource = ['category', 'visible', 'format', 'startdate', 'enddate'];
-        foreach ($fieldsFromSource as $field) {
-            if (!\array_key_exists($field, $newData)) {
-                $newData[$field] = $this->course->$field;;
+        $fieldsfromsource = ['category', 'visible', 'format', 'startdate', 'enddate'];
+        foreach ($fieldsfromsource as $field) {
+            if (!\array_key_exists($field, $newdata)) {
+                $newdata[$field] = $this->course->$field;;
             }
         }
         // Remove numsections if present to use default, otherwise there could be conflicts.
-        if (\array_key_exists('numsections', $newData)) {
-            unset($newData['numsections']);
+        if (\array_key_exists('numsections', $newdata)) {
+            unset($newdata['numsections']);
         }
         // However, check if section_name_X fields are present to create those sections later.
-        $newSectionData = $this->getNewSectionData($newData);
+        $newsectiondata = $this->get_new_section_data($newdata);
 
         // Check permissions before creating the course.
-        $catcontext = \context_coursecat::instance($newData['category']);
+        $catcontext = \context_coursecat::instance($newdata['category']);
         require_capability('moodle/course:create', $catcontext);
-        $newCourse = create_course((object)$newData);
+        $newcourse = create_course((object)$newdata);
 
         // Create sections in the new course if any section names were given.
-        $this->createSections($newCourse, $newSectionData);
+        $this->create_sections($newcourse, $newsectiondata);
 
         // Link the new course in the source course by adding a URL module in the old course.
-        if (\array_key_exists('link_new_course', $newData)) {
+        if (\array_key_exists('link_new_course', $newdata)) {
             $modLink= [
                 'module' => 'url',
-                'name' => $newData['link_new_course'],
-                'externalurl' => $CFG->wwwroot . '/course/view.php?id=' . $newCourse->id,
+                'name' => $newdata['link_new_course'],
+                'externalurl' => $CFG->wwwroot . '/course/view.php?id=' . $newcourse->id,
                 'section' => 0,
             ];
-            unset($newData['link_new_course']);
-            if (\array_key_exists('link_new_course_section', $newData)) {
-                $modLink['section'] = (int)$newData['link_new_course_section'];
-                unset($newData['link_new_course_section']);
+            unset($newdata['link_new_course']);
+            if (\array_key_exists('link_new_course_section', $newdata)) {
+                $modLink['section'] = (int)$newdata['link_new_course_section'];
+                unset($newdata['link_new_course_section']);
             }
-            if (\array_key_exists('link_new_course_section_position', $newData)) {
-                $modLink['section_pos'] = (int)$newData['link_new_course_section_position'];
-                unset($newData['link_new_course_section_position']);
+            if (\array_key_exists('link_new_course_section_position', $newdata)) {
+                $modLink['section_pos'] = (int)$newdata['link_new_course_section_position'];
+                unset($newdata['link_new_course_section_position']);
             }
-            $this->createModule($modLink);
+            $this->create_module($modLink);
         }
 
         // Check whether to add meta enrolment.
-        if (utils::isSetAndEnabled('metaenrolment', $newData)) {
-            $this->addMetaEnrolment($newCourse);
+        if (utils::is_set_and_enabled('metaenrolment', $newdata)) {
+            $this->add_meta_enrolment($newcourse);
         }
         // Check whether to copy participants.
-        if (utils::isSetAndEnabled('copyparticipants', $newData)) {
-            $this->copyCourseParticipants($newCourse);
+        if (utils::is_set_and_enabled('copyparticipants', $newdata)) {
+            $this->copy_course_participants($newcourse);
         }
         // Now delete the options if they had been set but maybe not enabled.
-        if (\array_key_exists('metaenrolment', $newData)) {
-            unset($newData['metaenrolment']);
+        if (\array_key_exists('metaenrolment', $newdata)) {
+            unset($newdata['metaenrolment']);
         }
-        if (\array_key_exists('copyparticipants', $newData)) {
-            unset($newData['copyparticipants']);
+        if (\array_key_exists('copyparticipants', $newdata)) {
+            unset($newdata['copyparticipants']);
         }
         // Set course completions.
-        foreach (\array_keys($newData) as $key) {
+        foreach (\array_keys($newdata) as $key) {
             if (str_starts_with($key, 'completion_criteria_')) {
-                $this->addCourseCompletion($newCourse, $newData);
+                $this->add_course_completion($newcourse, $newdata);
                 break;
             }
         }
         // Done, we rembember the source course and return the new course.
-        $this->sourceCourse = $this->course;
-        $this->course = $newCourse;
+        $this->sourcecourse = $this->course;
+        $this->course = $newcourse;
         return $this->course;
     }
 
     /**
      * Get new section data from the CSV row, in case there are any.
-     * @param array $newData from the CSV
+     * @param array $newdata from the CSV
      * @return array of sectionnum => sectionname
      * @throws \moodle_exception
      */
-    protected function getNewSectionData(array &$newData): array {
-        $newSectionData = [];
-        foreach (\array_keys($newData) as $key) {
+    protected function get_new_section_data(array &$newdata): array {
+        $newsectiondata = [];
+        foreach (\array_keys($newdata) as $key) {
             if (str_starts_with($key, 'section_name_')) {
                 $sectionparts = explode('_', $key);
                 if (count($sectionparts) === 3) {
@@ -212,7 +212,7 @@ class import_handler {
                         ];
                         throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
                     }
-                    $sectionname = $newData[$key];
+                    $sectionname = $newdata[$key];
                     if (trim($sectionname) === '') {
                         $a = [
                             'value' => $sectionname,
@@ -220,48 +220,48 @@ class import_handler {
                         ];
                         throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
                     }
-                    $newSectionData[$sectionnum] = $sectionname;
-                    unset($newData[$key]);
+                    $newsectiondata[$sectionnum] = $sectionname;
+                    unset($newdata[$key]);
                 }
             }
         }
-        if (empty($newSectionData)) {
+        if (empty($newsectiondata)) {
             return [];
         }
-        for ($i = 0; $i < max(\array_keys($newSectionData)) + 1; $i++) {
-            if (!\array_key_exists($i, $newSectionData)) {
-                $newSectionData[$i] = '';
+        for ($i = 0; $i < max(\array_keys($newsectiondata)) + 1; $i++) {
+            if (!\array_key_exists($i, $newsectiondata)) {
+                $newsectiondata[$i] = '';
             }
         }
-        ksort($newSectionData);
-        return $newSectionData;
+        ksort($newsectiondata);
+        return $newsectiondata;
     }
 
     /**
      * Create sections in the new course based on the given data.
-     * @param \stdClass $newCourse
-     * @param array $newSectionData
+     * @param \stdClass $newcourse
+     * @param array $newsectiondata
      * @return void
      */
-    protected function createSections(\stdClass $newCourse, array $newSectionData): void {
-        $existingsSections = get_fast_modinfo($newCourse)->get_section_info_all();
-        foreach ($newSectionData as $sectionNum => $sectionName) {
-            $section = !\array_key_exists($sectionNum, $existingsSections)
-                ? course_create_section($newCourse->id)
-                : $existingsSections[$sectionNum];
-            if (!empty($sectionName)) {
-                course_update_section($newCourse->id, $section, ['name' => $sectionName]);
+    protected function create_sections(\stdClass $newcourse, array $newsectiondata): void {
+        $existingssections = get_fast_modinfo($newcourse)->get_section_info_all();
+        foreach ($newsectiondata as $secnum => $secname) {
+            $section = !\array_key_exists($secnum, $existingssections)
+                ? course_create_section($newcourse->id)
+                : $existingssections[$secnum];
+            if (!empty($secname)) {
+                course_update_section($newcourse->id, $section, ['name' => $secname]);
             }
         }
     }
 
     /**
      * Add course completion criteria to the new course.
-     * @param \stdClass $newCourse
-     * @param array $newData
+     * @param \stdClass $newcourse
+     * @param array $newdata
      * @return void
      */
-    protected function addCourseCompletion(\stdClass $newCourse, array $newData): void {
+    protected function add_course_completion(\stdClass $newcourse, array $newdata): void {
         global $CFG;
         // Classes must be loaded here.
         require_once($CFG->libdir.'/completionlib.php');
@@ -276,52 +276,52 @@ class import_handler {
 
         // Prepare data object for criteria.
         $data = [
-            'id' => $newCourse->id,
+            'id' => $newcourse->id,
         ];
-        $data['overall_aggregation'] = \array_key_exists('completion_criteria_overall_aggregation', $newData)
-            ? utils::anyOrAll('completion_criteria_overall_aggregation', $newData) : COMPLETION_AGGREGATION_ALL;
+        $data['overall_aggregation'] = \array_key_exists('completion_criteria_overall_aggregation', $newdata)
+            ? utils::any_or_all('completion_criteria_overall_aggregation', $newdata) : COMPLETION_AGGREGATION_ALL;
         $data['activity_aggregation'] = 0;
-        if (\array_key_exists('completion_criteria_activity', $newData)) {
-            $activityIds = \array_map('intval', explode(',', $newData['completion_criteria_activity']));
+        if (\array_key_exists('completion_criteria_activity', $newdata)) {
+            $activityids = \array_map('intval', explode(',', $newdata['completion_criteria_activity']));
             if (!empty($activityIds)) {
-                $data['criteria_activity'] = array_fill_keys($activityIds, 1);
-                $data['activity_aggregation'] = utils::anyOrAll('completion_criteria_activity_aggregation', $newData);
+                $data['criteria_activity'] = array_fill_keys($activityids, 1);
+                $data['activity_aggregation'] = utils::any_or_all('completion_criteria_activity_aggregation', $newdata);
             }
         }
         $data['course_aggregation'] = 0;
-        if (\array_key_exists('completion_criteria_course', $newData)) {
-            $data['criteria_course'] = \array_map('intval', explode(',', $newData['completion_criteria_course']));
+        if (\array_key_exists('completion_criteria_course', $newdata)) {
+            $data['criteria_course'] = \array_map('intval', explode(',', $newdata['completion_criteria_course']));
             if (!empty($data['criteria_course'])) {
-                $data['course_aggregation'] = utils::anyOrAll('completion_criteria_course_aggregation', $newData);
+                $data['course_aggregation'] = utils::any_or_all('completion_criteria_course_aggregation', $newdata);
             }
         }
         $data['role_aggregation'] = 0;
-        if (\array_key_exists('completion_criteria_role', $newData)) {
-            $roles = \array_map('intval', explode(',', $newData['completion_criteria_role']));
+        if (\array_key_exists('completion_criteria_role', $newdata)) {
+            $roles = \array_map('intval', explode(',', $newdata['completion_criteria_role']));
             if (!empty($roles)) {
                 $data['criteria_role'] = array_fill_keys($roles, 1);
-                $data['role_aggregation'] = utils::anyOrAll('completion_criteria_role_aggregation', $newData);
+                $data['role_aggregation'] = utils::any_or_all('completion_criteria_role_aggregation', $newdata);
             }
         }
         // Simple criteria value mapping
-        foreach (['date', 'duration', 'grade'] as $criterium) {
-            $keyCriterion = 'completion_criteria_' . $criterium;
-            if (\array_key_exists($keyCriterion, $newData)) {
-                $data['criteria_' . $criterium] = 1;
-                $keyValue = 'criteria_' . $criterium . '_' . ($criterium === 'duration' ? 'days' :'value');
-                $data[$keyValue] = $criterium === 'date'
-                    ? utils::parseDateTime($keyCriterion, $newData)
-                    : $newData[$keyCriterion];
+        foreach (['date', 'duration', 'grade'] as $criterion) {
+            $keycriterion = 'completion_criteria_' . $criterion;
+            if (\array_key_exists($keycriterion, $newdata)) {
+                $data['criteria_' . $criterion] = 1;
+                $keyvalue = 'criteria_' . $criterion . '_' . ($criterion === 'duration' ? 'days' :'value');
+                $data[$keyvalue] = $criterion === 'date'
+                    ? utils::parse_datetime($keycriterion, $newdata)
+                    : $newdata[$keycriterion];
             }
         }
-        foreach (['unenrol', 'self'] as $criterium) {
-            if (\array_key_exists('completion_criteria_' . $criterium, $newData)) {
-                $data['criteria_' . $criterium] = (int)$newData['completion_criteria_' . $criterium] === 1 ? 1 : 0;
+        foreach (['unenrol', 'self'] as $criterion) {
+            if (\array_key_exists('completion_criteria_' . $criterion, $newdata)) {
+                $data['criteria_' . $criterion] = (int)$newdata['completion_criteria_' . $criterion] === 1 ? 1 : 0;
             }
         }
         $data = (object)$data;
 
-        $completion = new \completion_info($newCourse);
+        $completion = new \completion_info($newcourse);
         // Delete old criteria.
         $completion->clear_criteria(false);
 
@@ -343,12 +343,12 @@ class import_handler {
         $aggregation->save();
 
         // Handle aggregation types.
-        $aggregationTypes = [
+        $aggregationtypes = [
             COMPLETION_CRITERIA_TYPE_ACTIVITY => $data->activity_aggregation,
             COMPLETION_CRITERIA_TYPE_COURSE => $data->course_aggregation,
             COMPLETION_CRITERIA_TYPE_ROLE => $data->role_aggregation,
         ];
-        foreach ($aggregationTypes as $type => $method) {
+        foreach ($aggregationtypes as $type => $method) {
             $aggdata['criteriatype'] = $type;
             $aggregation = new \completion_aggregation($aggdata);
             $aggregation->setMethod($method);
@@ -357,8 +357,8 @@ class import_handler {
 
         // Trigger an event for course module completion changed.
         $event = \core\event\course_completion_updated::create([
-            'courseid' => $newCourse->id,
-            'context' => \context_course::instance($newCourse->id)
+            'courseid' => $newcourse->id,
+            'context' => \context_course::instance($newcourse->id)
         ]);
         $event->trigger();
     }
@@ -369,27 +369,27 @@ class import_handler {
      * @return modcreate_interface
      * @throws \moodle_exception
      */
-    public function createModule(array $data): modcreate_interface {
+    public function create_module(array $data): modcreate_interface {
         // Which module to add, load the correct class.
         if (str_contains($data['module'], '_')) {
-            $modNameParts = explode('_', $data['module']);
-            $modClassName = implode('_', \array_slice($modNameParts, 0, 2)) . '\\mod\\' . implode('\\', \array_slice($modNameParts, 2));
+            $modnameparts = explode('_', $data['module']);
+            $modclassname = implode('_', \array_slice($modnameparts, 0, 2)) . '\\mod\\' . implode('\\', \array_slice($modnameparts, 2));
             try {
-                $modClass = new $modClassName();
+                $modclass = new $modclassname();
             } catch (\Exception $e) {
-                throw new \moodle_exception('ex_invalidmoduleclass', 'local_attendance', '', $modClassName);
+                throw new \moodle_exception('ex_invalidmoduleclass', 'local_attendance', '', $modclassname);
             }
-            if (!($modClass instanceof modcreate_interface)) {
-                throw new \moodle_exception('ex_invalidimplements', 'local_attendance', '', $modClassName);
+            if (!($modclass instanceof modcreate_interface)) {
+                throw new \moodle_exception('ex_invalidimplements', 'local_attendance', '', $modclassname);
             }
         } else {
-            $modClass = new modcreate();
+            $modclass = new modcreate();
         }
 
         // In the class that creates the module, use the current course and create the module from the data.
-        $modClass->useCourse($this->course);
+        $modclass->use_course($this->course);
         try {
-            return $modClass->setRow($data)->create($data);
+            return $modclass->set_row($data)->create($data);
         } catch (\Exception $e) {
             debugging($e->getMessage());
             throw new \moodle_exception('ex_modulecreationfailed', 'local_attendance');
@@ -401,8 +401,8 @@ class import_handler {
      * @param \stdClass $newcourse
      * @return void
      */
-    public function copyCourseParticipants(\stdClass $newcourse): void {
-        $contextFrom = \context_course::instance($this->course->id);
+    public function copy_course_participants(\stdClass $newcourse): void {
+        $contextfrom = \context_course::instance($this->course->id);
         $enrols = enrol_get_instances($newcourse->id, true);
 
         foreach ($enrols as $enrol) {
@@ -411,10 +411,10 @@ class import_handler {
                 continue;
             }
 
-            $enrolledUsers = \array_keys(get_enrolled_users($contextFrom, '', 0, 'u.id'));
-            $users = get_users_roles($contextFrom, $enrolledUsers);
+            $enrolledusers = \array_keys(get_enrolled_users($contextfrom, '', 0, 'u.id'));
+            $users = get_users_roles($contextfrom, $enrolledusers);
             foreach ($users as $userid => $roles) {
-                if (!\in_array($userid, $enrolledUsers)) {
+                if (!\in_array($userid, $enrolledusers)) {
                     continue; // skip not enrolled
                 }
                 foreach ($roles as $role) {
@@ -430,7 +430,7 @@ class import_handler {
      * @param \stdClass $newcourse
      * @return void
      */
-    public function addMetaEnrolment(\stdClass $newcourse): void {
+    public function add_meta_enrolment(\stdClass $newcourse): void {
         $plugins = enrol_get_plugins(true);
         foreach ($plugins as $plugin) {
             if ($plugin->get_name() === 'meta') {
@@ -454,9 +454,9 @@ class import_handler {
      * @return modcreate_interface
      * @throws \moodle_exception
      */
-    public function createBadge(array $data): modcreate_interface {
+    public function create_badge(array $data): modcreate_interface {
         if (!\array_key_exists('imagecaption', $data)) {
-            $data['imagecaption'] = $this->sourceCourse->shortname ?? $this->course->shortname ?? '';
+            $data['imagecaption'] = $this->sourcecourse->shortname ?? $this->course->shortname ?? '';
         }
         if (\array_key_exists('imagefile', $data)) {
             if (!isset($this->options->files) || !\array_key_exists($data['imagefile'], $this->options->files)) {
@@ -465,7 +465,7 @@ class import_handler {
             $data['imagefile'] = $this->options->files[$data['imagefile']];
         }
         $badge = new badge();
-        $badge->useCourse($this->course)->setRow($data)->create($data);
+        $badge->use_course($this->course)->set_row($data)->create($data);
         return $badge;
     }
 }

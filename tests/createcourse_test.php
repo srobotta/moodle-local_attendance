@@ -76,9 +76,9 @@ final class createcourse_test extends \advanced_testcase {
      * @param \stdClass|null $options Options to pass to the import handler.
      * @return \stdClass The created course object.
      */
-    protected function runCsvTest(array $csvrow, ?\stdClass $options = null): \stdClass {
+    protected function run_csv_test(array $csvrow, ?\stdClass $options = null): \stdClass {
         $handler = new import_handler($options);
-        return $handler->createCourse($csvrow);
+        return $handler->create_course($csvrow);
     }
 
     /**
@@ -90,7 +90,7 @@ final class createcourse_test extends \advanced_testcase {
             'name' => 'Attendance Course',
             'shortname' => 'att-course',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals('Attendance Course', $newcourse->fullname);
         $this->assertEquals('att-course', $newcourse->shortname);
         $this->assertEquals($this->sourcecourse->category, $newcourse->category);
@@ -104,7 +104,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_short' => $this->sourcecourse->shortname,
             'name' => 'Attendance Via Shortname',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals('Attendance Via Shortname', $newcourse->fullname);
     }
 
@@ -118,7 +118,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_url' => $url,
             'name' => 'Attendance Via URL',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals('Attendance Via URL', $newcourse->fullname);
     }
 
@@ -129,7 +129,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'source_course_id' => $this->sourcecourse->id,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Fields should be inherited from source course.
         $this->assertEquals($this->sourcecourse->category, $newcourse->category);
@@ -147,7 +147,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'visible' => 0,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals(0, $newcourse->visible);
     }
 
@@ -162,7 +162,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'category' => $newcategory->id,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals($newcategory->id, $newcourse->category);
     }
 
@@ -174,7 +174,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'format' => 'weeks',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals('weeks', $newcourse->format);
     }
 
@@ -189,7 +189,7 @@ final class createcourse_test extends \advanced_testcase {
             'startdate' => $newstartdate,
             'enddate' => $newenddate,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $this->assertEquals($newstartdate, $newcourse->startdate);
         $this->assertEquals($newenddate, $newcourse->enddate);
     }
@@ -203,7 +203,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'source_course_id' => $this->sourcecourse->id,
         ];
-        $newcourse = $this->runCsvTest($csvrow, $options);
+        $newcourse = $this->run_csv_test($csvrow, $options);
         $this->assertStringContainsString('attendance-2025', $newcourse->shortname);
     }
 
@@ -216,7 +216,7 @@ final class createcourse_test extends \advanced_testcase {
             'section_name_1' => 'Obligatory Modules',
             'section_name_2' => 'Optional Modules',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
         $modinfo = get_fast_modinfo($newcourse);
         $sections = $modinfo->get_section_info_all();
 
@@ -233,7 +233,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'link_new_course' => 'Go to Attendance Course',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Check that a URL module was created in the source course linking to the new course.
         $module = $DB->get_record('modules', ['name' => 'url']);
@@ -255,7 +255,7 @@ final class createcourse_test extends \advanced_testcase {
             'link_new_course' => 'Attendance',
             'link_new_course_section' => 2,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Check that the URL module was created.
         $urlmodule = $DB->get_record('url', ['course' => $this->sourcecourse->id]);
@@ -277,7 +277,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'copyparticipants' => 1,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Check that the user is enrolled in the new course.
         $this->assertTrue(is_enrolled(\context_course::instance($newcourse->id), $user));
@@ -297,7 +297,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'source_course_id' => $this->sourcecourse->id,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // User should NOT be enrolled in the new course.
         $this->assertFalse(is_enrolled(\context_course::instance($newcourse->id), $user));
@@ -315,7 +315,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'metaenrolment' => 1,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Check that meta enrolment was added.
         $enrolments = $DB->get_records('enrol', [
@@ -336,7 +336,7 @@ final class createcourse_test extends \advanced_testcase {
             'completion_criteria_grade' => 8.0,
             'completion_criteria_overall_aggregation' => 'all',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify the completion info was set.
         $completion = new \completion_info($newcourse);
@@ -357,7 +357,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'completion_criteria_date' => $completedate,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify completion info was set.
         $completion = new \completion_info($newcourse);
@@ -377,7 +377,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'completion_criteria_duration' => 30,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify completion info was set.
         $completion = new \completion_info($newcourse);
@@ -395,7 +395,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'completion_criteria_self' => 1,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify completion info was set.
         $completion = new \completion_info($newcourse);
@@ -413,7 +413,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             'completion_criteria_unenrol' => 1,
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify completion info was set.
         $completion = new \completion_info($newcourse);
@@ -432,14 +432,14 @@ final class createcourse_test extends \advanced_testcase {
             'shortname' => 'att-course-1',
             'name' => 'Attendance Course 1',
         ];
-        $newcourse1 = $this->runCsvTest($csvrow1);
+        $newcourse1 = $this->run_csv_test($csvrow1);
 
         $csvrow2 = [
             'source_course_id' => $this->sourcecourse->id,
             'shortname' => 'att-course-2',
             'name' => 'Attendance Course 2',
         ];
-        $newcourse2 = $this->runCsvTest($csvrow2);
+        $newcourse2 = $this->run_csv_test($csvrow2);
 
         $this->assertNotEquals($newcourse1->id, $newcourse2->id);
         $this->assertEquals('att-course-1', $newcourse1->shortname);
@@ -454,7 +454,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'source_course_id' => 99999,
         ];
-        $this->runCsvTest($csvrow);
+        $this->run_csv_test($csvrow);
     }
 
     /**
@@ -465,7 +465,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'source_course_short' => 'nonexistent-course',
         ];
-        $this->runCsvTest($csvrow);
+        $this->run_csv_test($csvrow);
     }
 
     /**
@@ -476,7 +476,7 @@ final class createcourse_test extends \advanced_testcase {
         $csvrow = [
             'name' => 'Orphan Course',
         ];
-        $this->runCsvTest($csvrow);
+        $this->run_csv_test($csvrow);
     }
 
     /**
@@ -489,7 +489,7 @@ final class createcourse_test extends \advanced_testcase {
             'completion_criteria_date' => '2025-12-31',
             'completion_criteria_overall_aggregation' => 'any',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Verify completion info was set.
         $completion = new \completion_info($newcourse);
@@ -507,7 +507,7 @@ final class createcourse_test extends \advanced_testcase {
             'source_course_id' => $this->sourcecourse->id,
             // Do not set shortname
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         // Shortname should have a suffix added (either from options or timestamp).
         $this->assertNotEquals($this->sourcecourse->shortname, $newcourse->shortname);
@@ -532,7 +532,7 @@ final class createcourse_test extends \advanced_testcase {
             'section_name_1' => 'Week 1',
             'section_name_2' => 'Week 2',
         ];
-        $newcourse = $this->runCsvTest($csvrow);
+        $newcourse = $this->run_csv_test($csvrow);
 
         $this->assertEquals('Comprehensive Test Course', $newcourse->fullname);
         $this->assertEquals('comp-test', $newcourse->shortname);

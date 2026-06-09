@@ -28,13 +28,13 @@ interface import_interface {
      * Get the CSV delimiter selected in the form.
      * @return string CSV delimiter.
      */
-    public function getCsvDelimiter(): string;
+    public function get_csv_delimiter(): string;
 
     /**
      * Get the course suffix entered in the form.
      * @return string Course suffix.
      */
-    public function getCourseSuffix(): string;
+    public function get_course_suffix(): string;
 
     /**
      * Get the content files uploaded via the form as an array with
@@ -42,16 +42,16 @@ interface import_interface {
      *
      * @return array Array of stored_file objects.
      */
-    public function getContentFiles(): array;
+    public function get_content_files(): array;
 
     /**
      * Get the path to the CSV file to be imported.
      * @return string Path to CSV file.
      */
-    public function getCsvFile(): string;
+    public function get_csv_file(): string;
 
     /**
      * Cleanup any temporary files if necessary.
      */
-    public function cleanupFiles(): void;
+    public function cleanup_files(): void;
 }

@@ -41,7 +41,7 @@ class quiz extends modcreate {
      * The password rule for the attendance quiz.
      * @var string|null
      */
-    protected ?string $passwordRule = null;
+    protected ?string $passwordrule = null;
 
     /**
      * Use an existing course where the activity will be created.
@@ -49,8 +49,8 @@ class quiz extends modcreate {
      * @param \stdClass $course
      * @return modcreate_interface
      */
-    public function useCourse(\stdClass $course): modcreate_interface{
-        parent::useCourse($course);
+    public function use_course(\stdClass $course): modcreate_interface{
+        parent::use_course($course);
         $save = false;
         // When creating attendance quizzes, we require the course to be in topics format.
         if ($this->course->format !== 'topics') {
@@ -75,7 +75,7 @@ class quiz extends modcreate {
      */
     public function create(array $data): modcreate_interface {
         // If set, check the password rule that is set in the key 'local_attendance_attendancequiz_passwordrule'.
-        $this->passwordRule = \array_key_exists('local_attendance_quiz_passwordrule', $data)
+        $this->passwordrule = \array_key_exists('local_attendance_quiz_passwordrule', $data)
             ? $data['local_attendance_quiz_passwordrule'] : 'lower';
         // Unset module-specific data that is not for quiz.
         foreach (\array_keys($data) as $key) {
@@ -90,11 +90,11 @@ class quiz extends modcreate {
             if (\array_key_exists($key, $data) === false) {
                 throw new \moodle_exception('ex_missingfield', 'local_attendance', '', ['field' => $key]);
             }
-            $data[$key] = utils::parseDateTime($key, $data);
+            $data[$key] = utils::parse_datetime($key, $data);
         }
         // If the quiz password is not set, set a default one from a list.
         if (!isset($data['quizpassword'])) {
-            $data['quizpassword'] = $this->getPassword();
+            $data['quizpassword'] = $this->get_password();
         }
         // There should be a short limit for the quiz to avoid long attempts.
         if (!\array_key_exists('timelimit', $data)) {
@@ -115,9 +115,9 @@ class quiz extends modcreate {
         // Create the module now.
         parent::create($data);
         // Get the course module instance.
-        $this->cm = get_coursemodule_from_instance('quiz', $this->getId(), $this->course->id, false, MUST_EXIST);
-        $this->moduleinfo->questionid = $this->addQuestion();
-        $this->assertGradable();
+        $this->cm = get_coursemodule_from_instance('quiz', $this->get_id(), $this->course->id, false, MUST_EXIST);
+        $this->moduleinfo->questionid = $this->add_question();
+        $this->assert_gradable();
         return $this;
     }
 
@@ -125,12 +125,12 @@ class quiz extends modcreate {
      * Setup correct grade item (must be the sum of all grade items in the course)
      * to make sure the completion criteria based on grade work correctly.
      */
-    protected function assertGradable(): void {
+    protected function assert_gradable(): void {
         $gradeItem = \grade_item::fetch([
             'courseid' => $this->course->id,
             'itemtype' => 'mod',
             'itemmodule' => 'quiz',
-            'iteminstance' => $this->getId()
+            'iteminstance' => $this->get_id()
         ]);
         $gradeCat = $gradeItem->get_parent_category();
         if ($gradeCat && (int)$gradeCat->aggregation !== GRADE_AGGREGATE_SUM) {
@@ -144,14 +144,14 @@ class quiz extends modcreate {
      * Add a question to the created quiz.
      * @return int
      */
-    protected function addQuestion(): int {
+    protected function add_question(): int {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
         require_once($CFG->libdir . '/questionlib.php'); 
         $quiz = $DB->get_record('quiz', ['id' => $this->cm->instance], '*', MUST_EXIST);
         $quizobj = new quiz_settings($quiz, $this->cm, $this->course);
         $quizobj->get_structure()->check_can_be_edited();
-        $questionid = $this->createQuestion();
+        $questionid = $this->create_question();
         quiz_add_quiz_question($questionid, $quiz, 0);
         $quizobj->get_grade_calculator()->recompute_quiz_sumgrades();
         return $questionid;
@@ -162,7 +162,7 @@ class quiz extends modcreate {
      * @return int the created question id
      * @throws \moodle_exception
      */
-    protected function createQuestion(): int {
+    protected function create_question(): int {
         \core_question\local\bank\helper::require_plugin_enabled('qbank_editquestion');
 
         $context = \context_module::instance($this->cm->id);
@@ -186,11 +186,11 @@ class quiz extends modcreate {
         $questiondata = new \stdClass();
         $questiondata->name = $this->row['local_attendance_quiz_questionname'] 
             ?? get_string('col_questionname', 'local_attendance');
-        $questiondata->questiontext = $this->getTextAndFormat(
+        $questiondata->questiontext = $this->get_text_and_format(
             'local_attendance_quiz_questiontext',
             get_string('col_questiontext', 'local_attendance')
         );
-        $questiondata->generalfeedback = $this->getTextAndFormat(
+        $questiondata->generalfeedback = $this->get_text_and_format(
             'local_attendance_quiz_generalfeedback',
             get_string('col_generalfeedback', 'local_attendance')
         );
@@ -209,16 +209,16 @@ class quiz extends modcreate {
         $questiondata->defaultmark = 1.0;
         $questiondata->answernumbering = 'none';
         $questiondata->answer = [
-            $this->getTextAndFormat('local_attendance_quiz_answer_yes', get_string('yes')),
-            $this->getTextAndFormat('local_attendance_quiz_answer_no', get_string('no')),
+            $this->get_text_and_format('local_attendance_quiz_answer_yes', get_string('yes')),
+            $this->get_text_and_format('local_attendance_quiz_answer_no', get_string('no')),
         ];
         $questiondata->fraction = [
             1.0,
             0,
         ];
         $questiondata->feedback = [
-            $this->getTextAndFormat('local_attendance_quiz_feedback_yes', ''),
-            $this->getTextAndFormat('local_attendance_quiz_feedback_no', ''),
+            $this->get_text_and_format('local_attendance_quiz_feedback_yes', ''),
+            $this->get_text_and_format('local_attendance_quiz_feedback_no', ''),
         ];
         $questiondata->single = 1;
         $questiondata->shuffleanswers = 0;
@@ -227,8 +227,8 @@ class quiz extends modcreate {
         $questiondata->category = $category->id . ',' . $category->contextid;
         // Get the question type object and save the question.
         $qtypeobj = \question_bank::get_qtype($question->qtype);
-        $storedQuestion = $qtypeobj->save_question($question, $questiondata);
-        return $storedQuestion->id;
+        $storedquestion = $qtypeobj->save_question($question, $questiondata);
+        return $storedquestion->id;
     }
 
     /**
@@ -238,23 +238,23 @@ class quiz extends modcreate {
      * @return string the generated password
      * @throws \Exception
      */
-    protected function getPassword(): string {
+    protected function get_password(): string {
         // Simple generated passwords.
-        if (\in_array($this->passwordRule, ['lower', 'alpha' , 'alnum', 'all'])) {
+        if (\in_array($this->passwordrule, ['lower', 'alpha' , 'alnum', 'all'])) {
             $length = 6;
             $charset = 'abcdefghijklmnopqrstuvwxyz';
             $password = '';
-            if ($this->passwordRule !== 'lower') {
+            if ($this->passwordrule !== 'lower') {
                 $charset .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             }
-            if ($this->passwordRule === 'alnum' || $this->passwordRule === 'all') {
+            if ($this->passwordrule === 'alnum' || $this->passwordrule === 'all') {
                 $charset .= '0123456789';
-                if ($this->passwordRule === 'all') {
+                if ($this->passwordrule === 'all') {
                     $charset .= '!@#$%&*()_+-={}[]|:;<>,.?/';
                 }
             }
             $max = strlen($charset) - 1;
-            while (!$this->isvalidGeneratedPassword($password)) {
+            while (!$this->is_valid_generated_password($password)) {
                 $password = '';
                 for ($i = 0; $i < $length; $i++) {
                     $password .= $charset[random_int(0, $max)];
@@ -263,7 +263,7 @@ class quiz extends modcreate {
             return $password;
         }
         // Sanitize the rule to avoid path traversal.
-        $rule = preg_replace('/[^a-z_]/', '', $this->passwordRule);
+        $rule = preg_replace('/[^a-z_]/', '', $this->passwordrule);
         $ruleFile = __DIR__ . '/../../wordlist/' . $rule . '.csv';
         // Pick a random line from the wordlist file and use that as password.
         if (file_exists($ruleFile)) {
@@ -282,7 +282,7 @@ class quiz extends modcreate {
             'ex_invalidpasswdrule',
             'local_attendance',
             '',
-            ['rule' => $this->passwordRule]
+            ['rule' => $this->passwordrule]
         );
     }
 
@@ -291,7 +291,7 @@ class quiz extends modcreate {
      * @param string $password
      * @return bool
      */
-    protected function isvalidGeneratedPassword(string $password): bool {
+    protected function is_valid_generated_password(string $password): bool {
         $notThese = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
         foreach ($notThese as $pair) {
             if (str_contains($password, $pair)) {
@@ -305,7 +305,7 @@ class quiz extends modcreate {
      * Return the used password for the quiz.
      * @return string
      */
-    public function getAdditionalData(): string
+    public function get_additional_data(): string
     {
         return get_string('password') . '=' . $this->moduleinfo->password;
     }

@@ -48,7 +48,7 @@ class generic_form {
         $htmlForm = $reflection->getProperty('_form');
         $form = $htmlForm->getValue($this->moodleform);
         foreach ($form->_elements as $element) {
-                $res = $this->getNameAndValueFromElement($element);
+                $res = $this->get_name_and_value_from_element($element);
                 if ($res === null) {
                     continue;
                 }
@@ -72,7 +72,7 @@ class generic_form {
      * @param mixed $element
      * @return array|\stdClass|null
      */
-    protected function getNameAndValueFromElement($element): array|\stdClass|null {
+    protected function get_name_and_value_from_element($element): array|\stdClass|null {
         // Headlines and non-named elements (aka html) have no value.
         $name = $element->getName();
         if (!$name || $element instanceof \MoodleQuickForm_header || $element instanceof \MoodleQuickForm_submit) {
@@ -125,7 +125,7 @@ class generic_form {
             $elements = $element->getElements();
             $fields = new \stdClass();
             foreach ($elements as $el) {
-                [$innerName, $innerValue] = $this->getNameAndValueFromElement($el);
+                [$innerName, $innerValue] = $this->get_name_and_value_from_element($el);
                 if ($innerValue === null) {
                     continue;
                 }

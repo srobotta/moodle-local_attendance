@@ -48,20 +48,20 @@ if ($mform->is_submitted() && $mform->is_validated()) {
     raise_memory_limit(MEMORY_HUGE);
 
     $importHandler = new import_handler((object)[
-        'suffix' => $mform->getCourseSuffix(),
-        'files' => $mform->getContentFiles(),
+        'suffix' => $mform->get_course_suffix(),
+        'files' => $mform->get_content_files(),
     ]);
-    $csvImport = new csv_import($importHandler, $mform);
-    $csvImport->importCsvFile();
-    $mform->cleanupFiles();
-    if (!$csvImport->hasError()) {
+    $csvimport = new csv_import($importHandler, $mform);
+    $csvimport->import_csv_file();
+    $mform->cleanup_files();
+    if (!$csvimport->has_error()) {
         echo $OUTPUT->notification(get_string('importsuccess', 'local_attendance'), 'notifysuccess');
     } else {
         echo $OUTPUT->notification(get_string('importfailed', 'local_attendance'), 'notifyalert');
     }
     echo $OUTPUT->heading(get_string('importlog', 'local_attendance'), 3);
     echo '<pre>';
-    foreach ($csvImport->getLog() as $logentry) {
+    foreach ($csvimport->get_log() as $logentry) {
         echo $logentry . "\n";
     }
     echo '</pre>';

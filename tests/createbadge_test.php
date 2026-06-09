@@ -81,30 +81,30 @@ final class createbadge_test extends \advanced_testcase {
      *
      * @param array $csvrow The CSV row data for badge creation.
      * @param \stdClass|null $options Options to pass to the import handler.
-     * @param int $useCourseId The ID of the course to use for badge creation (0 to create a new course).
+     * @param int $usecourseid The ID of the course to use for badge creation (0 to create a new course).
      * @return content\badge The created badge object.
      */
-    protected function runBadgeTest(array $csvrow, ?\stdClass $options = null, int $useCourseId = 0): content\badge {
+    protected function run_badge_test(array $csvrow, ?\stdClass $options = null, int $usecourseid = 0): content\badge {
         $handler = new import_handler($options);    
-        if ($useCourseId === 0) {
+        if ($usecourseid === 0) {
             // First, create the course where the badge will be created.
-            $courseCsvData = [
+            $coursecsvdata = [
                 'source_course_id' => $this->sourcecourse->id,
             ];
-            $handler->createCourse($courseCsvData);
+            $handler->create_course($coursecsvdata);
         } else {
             // If not creating a course, use the existing course for badge creation.
-            $handler->useCourse(['source_course_id' => $useCourseId]);
+            $handler->use_course(['source_course_id' => $usecourseid]);
         }
         // Now create the badge in that course.
-        return $handler->createBadge($csvrow);
+        return $handler->create_badge($csvrow);
     }
 
     /**
      * Helper method to check that the badge image was created correctly.
      * @param \stdClass $badge The badge record from the database to check the image for.
      */
-    protected function runBadgeImageTest(\stdClass $badge): void {
+    protected function run_badge_image_test(\stdClass $badge): void {
         global $CFG;
         $files = get_file_storage()->get_area_files(
             \context_course::instance($badge->courseid)->id,
@@ -134,10 +134,10 @@ final class createbadge_test extends \advanced_testcase {
         $csvrow = [
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
         // Get the created badge from database.
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
 
         // Verify defaults were used.
         $this->assertNotEmpty($badge->name);
@@ -154,9 +154,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Attendance Achievement',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertEquals('Attendance Achievement', $badge->name);
     }
 
@@ -170,9 +170,9 @@ final class createbadge_test extends \advanced_testcase {
             'description' => 'Badge awarded for perfect attendance',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertEquals('Badge awarded for perfect attendance', $badge->description);
     }
 
@@ -186,9 +186,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'grade' => 50,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -210,9 +210,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_COURSE',
             'criteria_courses' => $othercourse->id,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -227,9 +227,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_ACTIVITY',
             'criteria_activity' => 1,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -244,9 +244,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_PROFILE',
             'criteria_profile_email' => 'test@example.com',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -260,9 +260,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Int Criteria Badge',
             'criteriatype' => 2,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -277,9 +277,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             // No imagefile - should generate image.
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
 
         // Check that badge has an image (check if image file exists in badge context).
         $context = \context_course::instance($badge->courseid);
@@ -301,9 +301,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagecaption' => 'CUSTOM-CAP',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -319,9 +319,9 @@ final class createbadge_test extends \advanced_testcase {
             'bgcolor' => 'FF5733',
             'fgcolor' => '000000',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -337,9 +337,9 @@ final class createbadge_test extends \advanced_testcase {
             'width' => 400,
             'height' => 400,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -354,9 +354,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagemode' => 'TEXT_ONLY',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -371,9 +371,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagemode' => 'TEXT_CHECKMARK',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -388,9 +388,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagemode' => 'TEXT_TTF',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -405,9 +405,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagemode' => 1, // TEXT_CHECKMARK
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -421,9 +421,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Enabled Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         // Badge should be enabled (status not equal to BADGE_STATUS_INACTIVE).
         $this->assertNotEquals(BADGE_STATUS_INACTIVE, $badge->status);
     }
@@ -439,9 +439,9 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'badgedisable' => 1,
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
     }
 
@@ -453,10 +453,10 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'ID Test Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
         // Badge ID should be positive integer.
-        $this->assertGreaterThan(0, $badgeobj->getId());
+        $this->assertGreaterThan(0, $badgeobj->get_id());
     }
 
     /**
@@ -467,9 +467,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Entity Name Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $this->assertEquals('badge', $badgeobj->getEntityName());
+        $this->assertEquals('badge', $badgeobj->get_entity_name());
     }
 
     /**
@@ -482,7 +482,7 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Invalid Badge',
             'criteriatype' => 'INVALID_CRITERIA_TYPE',
         ];
-        $this->runBadgeTest($csvrow);
+        $this->run_badge_test($csvrow);
     }
 
     /**
@@ -499,7 +499,7 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             'imagefile' => 'nonexistent.png',
         ];
-        $this->runBadgeTest($csvrow, $options);
+        $this->run_badge_test($csvrow, $options);
     }
 
     /**
@@ -512,15 +512,15 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Badge 1',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj1 = $this->runBadgeTest($csvrow1);
-        $badge1 = $DB->get_record('badge', ['id' => $badgeobj1->getId()]);
+        $badgeobj1 = $this->run_badge_test($csvrow1);
+        $badge1 = $DB->get_record('badge', ['id' => $badgeobj1->get_id()]);
 
         $csvrow2 = [
             'name' => 'Badge 2',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj2 = $this->runBadgeTest($csvrow2, null, $badge1->courseid);
-        $badge2 = $DB->get_record('badge', ['id' => $badgeobj2->getId()]);
+        $badgeobj2 = $this->run_badge_test($csvrow2, null, $badge1->courseid);
+        $badge2 = $DB->get_record('badge', ['id' => $badgeobj2->get_id()]);
         // Both badges should be created in the same course.
         $this->assertEquals($badge1->courseid, $badge2->courseid);
         $this->assertNotEquals($badge1->id, $badge2->id);
@@ -537,11 +537,11 @@ final class createbadge_test extends \advanced_testcase {
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
             // No imagecaption provided, should use source course shortname.
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
-        $this->runBadgeImageTest($badge);
+        $this->run_badge_image_test($badge);
     }
 
     /**
@@ -560,12 +560,12 @@ final class createbadge_test extends \advanced_testcase {
             'height' => 350,
             'imagemode' => 'TEXT_CHECKMARK',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertNotNull($badge);
         $this->assertEquals('Fully Customized Badge', $badge->name);
-        $this->runBadgeImageTest($badge);
+        $this->run_badge_image_test($badge);
     }
 
     /**
@@ -578,9 +578,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Course Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
         $this->assertEquals(BADGE_TYPE_COURSE, $badge->type);
     }
 
@@ -594,9 +594,9 @@ final class createbadge_test extends \advanced_testcase {
             'name' => 'Course Specific Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
         ];
-        $badgeobj = $this->runBadgeTest($csvrow);
+        $badgeobj = $this->run_badge_test($csvrow);
 
-        $badge = $DB->get_record('badge', ['id' => $badgeobj->getId()], '*', MUST_EXIST);
+        $badge = $DB->get_record('badge', ['id' => $badgeobj->get_id()], '*', MUST_EXIST);
 
         // Badge should be created in the course created by the import handler,
         // which is a new course based on sourcecourse.

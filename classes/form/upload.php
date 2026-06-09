@@ -32,13 +32,13 @@ class upload extends \moodleform implements import_interface {
      * Path to uploaded CSV file.
      * @var string|null
      */
-    private $csvFile;
+    private $csvfile;
 
     /**
      * Array of uploaded content files.
      * @var array|null
      */
-    private $contentFiles;
+    private $contentfiles;
 
     /**
      * Define the form fields.
@@ -74,7 +74,7 @@ class upload extends \moodleform implements import_interface {
      * Get the CSV delimiter selected in the form.
      * @return string CSV delimiter.
      */
-    public function getCsvDelimiter(): string {
+    public function get_csv_delimiter(): string {
         $data = $this->get_data();
         return $data->delimiter ?? csv_import::DELIMITER_COMMA;
     }
@@ -83,7 +83,7 @@ class upload extends \moodleform implements import_interface {
      * Get the course suffix entered in the form.
      * @return string Course suffix.
      */
-    public function getCourseSuffix(): string {
+    public function get_course_suffix(): string {
         $data = $this->get_data();
         return $data->coursesuffix ?? get_string('form_value_coursesuffix', 'local_attendance');
     }
@@ -94,25 +94,25 @@ class upload extends \moodleform implements import_interface {
      *
      * @return array Array of stored_file objects.
      */
-    public function getContentFiles(): array {
-        if ($this->contentFiles !== null) {
-            return $this->contentFiles;
+    public function get_content_files(): array {
+        if ($this->contentfiles !== null) {
+            return $this->contentfiles;
         }
-        $this->contentFiles = $this->getUploadedFiles('contentfiles');
-        return $this->contentFiles;
+        $this->contentfiles = $this->get_uploaded_files('contentfiles');
+        return $this->contentfiles;
     }
 
     /**
      * Get the path to the uploaded CSV file.
      * @return string Path to temporary CSV file.
      */
-    public function getCsvFile(): string {
-        if ($this->csvFile !== null) {
-            return $this->csvFile;
+    public function get_csv_file(): string {
+        if ($this->csvfile !== null) {
+            return $this->csvfile;
         }
-        $files = $this->getUploadedFiles('csvfile');
-        $this->csvFile = reset($files);
-        return $this->csvFile;
+        $files = $this->get_uploaded_files('csvfile');
+        $this->csvfile = reset($files);
+        return $this->csvfile;
     }
 
     /**
@@ -122,7 +122,7 @@ class upload extends \moodleform implements import_interface {
      * @return array Array with key = filename and value = path to temporary file.
      * @throws \moodle_exception
      */
-    protected function getUploadedFiles(string $fieldname): array {
+    protected function get_uploaded_files(string $fieldname): array {
         global $USER;
         $data = $this->get_data();
         if (!isset($data->{$fieldname})) {
@@ -149,16 +149,16 @@ class upload extends \moodleform implements import_interface {
      * Cleanup temporary files created during upload.
      * @return void
      */
-    public function cleanupFiles(): void {
-        if (!is_null($this->csvFile)) {
-            @unlink($this->csvFile);
-            $this->csvFile = null;
+    public function cleanup_Files(): void {
+        if (!is_null($this->csvfile)) {
+            @unlink($this->csvfile);
+            $this->csvfile = null;
         }
-        if (!is_null($this->contentFiles)) {
-            foreach ($this->contentFiles as $file) {
+        if (!is_null($this->contentfiles)) {
+            foreach ($this->contentfiles as $file) {
                 @unlink($file);
             }
-            $this->contentFiles = null;
+            $this->contentfiles = null;
         }
     }
 }

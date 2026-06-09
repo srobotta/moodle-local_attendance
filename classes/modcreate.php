@@ -51,7 +51,7 @@ class modcreate implements modcreate_interface {
      * @param \stdClass $course
      * @return modcreate_interface
      */
-    public function useCourse(\stdClass $course): modcreate_interface {
+    public function use_course(\stdClass $course): modcreate_interface {
         global $COURSE;
         $this->course = $course;
         // At least completion needs this to be set to the current course where activities are created in.
@@ -64,7 +64,7 @@ class modcreate implements modcreate_interface {
      * @param array $row
      * @return modcreate_interface
      */
-    public function setRow(array $row): modcreate_interface {
+    public function set_row(array $row): modcreate_interface {
         $this->row = $row;
         return $this;
     }
@@ -102,12 +102,12 @@ class modcreate implements modcreate_interface {
         if (\array_key_exists('section_pos', $data)) {
             // Section position is also accepted.
             $modules = \course_modinfo::get_array_of_activities($this->course);
-            $posCounter = 0;
+            $poscounter = 0;
             foreach ($modules as $mod) {
                 if ($mod->section == $sectionnum) {
-                    $posCounter++;
-                    if ($posCounter >= $data['section_pos']) {
-                        $beforeModule = $mod->cm;
+                    $poscounter++;
+                    if ($poscounter >= $data['section_pos']) {
+                        $beforemodule = $mod->cm;
                         break;
                     }
                 }
@@ -116,11 +116,11 @@ class modcreate implements modcreate_interface {
         }
 
         // Prepare the data for the new module.
-        [$mod, $context, $cw, $cm, $modInfoData] = prepare_new_moduleinfo_data($this->course, $modname, $sectionnum);
-        $modInfoData->add = $modname;
-        $modInfoData->modulename = $modname;
-        if (isset($beforeModule)) {
-            $modInfoData->beforemod = $beforeModule;
+        [$mod, $context, $cw, $cm, $modinfodata] = prepare_new_moduleinfo_data($this->course, $modname, $sectionnum);
+        $modinfodata->add = $modname;
+        $modinfodata->modulename = $modname;
+        if (isset($beforemodule)) {
+            $modinfodata->beforemod = $beforemodule;
         }
         // Prepare the form in order to get default values for the module, also validation can be done here.
         $modmoodleform = "$CFG->dirroot/mod/{$modname}/mod_form.php";
@@ -131,17 +131,17 @@ class modcreate implements modcreate_interface {
         }
         // Load the module form with the data that can be set and apply defaults.
         $mformclassname = "\\mod_{$modname}_mod_form";
-        $mform = new $mformclassname($modInfoData, $cw->section, $cm, $this->course);
-        $mform->set_data($modInfoData);
-        $formData = utils::mergeData($mform, $data);
+        $mform = new $mformclassname($modinfodata, $cw->section, $cm, $this->course);
+        $mform->set_data($modinfodata);
+        $formdata = utils::merge_data($mform, $data);
         // Setup some required fields that are not in the form.
-        $formData->modulename = $modname;
-        $formData->visible = 1;
+        $formdata->modulename = $modname;
+        $formdata->visible = 1;
         // Thow an error if there is no module name given.
-        if (empty($formData->name)) {
+        if (empty($formdata->name)) {
             throw new \moodle_exception('ex_modnamemempty', 'local_attendance');
         }
-        $this->moduleinfo = add_moduleinfo($formData, $this->course, $mform);
+        $this->moduleinfo = add_moduleinfo($formdata, $this->course, $mform);
         return $this;
     }
 
@@ -151,30 +151,30 @@ class modcreate implements modcreate_interface {
      * @param string $default
      * @return array with 'text' and 'format' keys
      */
-    public function getTextAndFormat(string $key, string $default = ''): array {
+    public function get_text_and_format(string $key, string $default = ''): array {
         $value = $this->row[$key] ?? $default;
-        return utils::getTextAndFormat($value);
+        return utils::get_text_and_format($value);
     }
 
     /**
      * Get the URL to the created module.
      * @return string
      */
-    public function getUrl(): string {
-        return (new \moodle_url('/mod/' . $this->getEntityName() . '/view.php', ['id' => $this->getCmId()]))->out();
+    public function get_url(): string {
+        return (new \moodle_url('/mod/' . $this->get_entity_name() . '/view.php', ['id' => $this->get_cm_id()]))->out();
     }
 
     /** 
      * Get the display name of the created module.
      */
-    public function getName(): string {
+    public function get_name(): string {
         return $this->moduleinfo->name;
     }
 
     /**
      * Get the instance ID of the created module.
      */
-    public function getCmId(): int {
+    public function get_cm_id(): int {
         return (int)$this->moduleinfo->coursemodule;
     }
 
@@ -182,7 +182,7 @@ class modcreate implements modcreate_interface {
      * Get the instance ID of the created module.
      * @return int
      */
-    public function getId(): int {
+    public function get_id(): int {
         return (int)$this->moduleinfo->instance;
     }
 
@@ -190,7 +190,7 @@ class modcreate implements modcreate_interface {
      * Get the technical module name of the created module.
      * @return string
      */
-    public function getEntityName(): string {
+    public function get_entity_name(): string {
         return $this->moduleinfo->modulename;
     }
 
@@ -199,7 +199,7 @@ class modcreate implements modcreate_interface {
      * The returned string should be something like a JSON object or key=value pairs.
      * @return string
      */
-    public function getAdditionalData(): string {
+    public function get_additional_data(): string {
         return ''; // No additional data by default.
     }
 }

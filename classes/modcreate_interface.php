@@ -33,7 +33,7 @@ interface modcreate_interface {
      * @param \stdClass $course
      * @return modcreate_interface
      */
-    public function useCourse(\stdClass $course): modcreate_interface;
+    public function use_course(\stdClass $course): modcreate_interface;
 
     /**
      * Create a new activity in the course.
@@ -49,42 +49,42 @@ interface modcreate_interface {
      * @param array $row
      * @return modcreate_interface
      */
-    public function setRow(array $row): modcreate_interface;
+    public function set_row(array $row): modcreate_interface;
 
     /**
      * Get the URL to the created module.
      * @return string
      */
-    public function getUrl(): string;
+    public function get_url(): string;
 
     /**
      * Get the display name of the created module.
      * @return string
      */
-    public function getName(): string;
+    public function get_name(): string;
 
     /**
      * Get the course module ID of the created module.
      * @return int
      */
-    public function getCmId(): int;
+    public function get_cm_id(): int;
 
     /**
      * Get the instance ID of the created module.
      * @return int
      */
-    public function getId(): int;
+    public function get_id(): int;
 
     /**
      * Get the technical module name of the created module or other entity.
      * @return string
      */
-    public function getEntityName(): string;
+    public function get_entity_name(): string;
 
     /**
      * Get additional info about the created module for the log.
      * The returned string should be something like a JSON object or key=value pairs.
      * @return string
      */
-    public function getAdditionalData(): string;
+    public function get_additional_data(): string;
 }

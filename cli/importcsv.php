@@ -76,40 +76,40 @@ if (empty($csvFile)) {
 }
 
 // Map filenames of content files and csv file.
-$csvFile = path::resolvePath($csvFile);
-$contentFiles = [];
+$csvfile = path::resolve_path($csvFile);
+$contentfiles = [];
 foreach ($files as $file) {
     $fname = basename($file);
-    $contentFiles[$fname] = path::resolvePath($file);
+    $contentfiles[$fname] = path::resolve_path($file);
 }
 
 // Check if CSV file exists.
-if (!file_exists($csvFile)) {
-    cli_error('CSV file not found: ' . $csvFile);
+if (!file_exists($csvfile)) {
+    cli_error('CSV file not found: ' . $csvfile);
 }
 
 // Set user to site admin for permission checks and to avoid issues with file access.
 $admin = get_admin();
 \core\session\manager::set_user($admin);
 
-$mform = new form($csvFile, $contentFiles, $options['suffix'] ?? null, $options['del'] ?? null);
+$mform = new form($csvfile, $contentfiles, $options['suffix'] ?? null, $options['del'] ?? null);
 $importHandler = new import_handler((object)[
-    'suffix' => $mform->getCourseSuffix(),
-    'files' => $mform->getContentFiles(),
+    'suffix' => $mform->get_course_suffix(),
+    'files' => $mform->get_content_files(),
 ]);
 $csvImport = new csv_import($importHandler, $mform);
-$csvImport->importCsvFile();
-$mform->cleanupFiles();
-if (!$csvImport->hasError()) {
+$csvImport->import_csv_file();
+$mform->cleanup_files();
+if (!$csvImport->has_error()) {
     echo get_string('importsuccess', 'local_attendance');
 } else {
     echo get_string('importfailed', 'local_attendance');
 }
 echo PHP_EOL;
-foreach ($csvImport->getLog() as $logentry) {
+foreach ($csvImport->get_log() as $logentry) {
     echo $logentry . PHP_EOL;
 }
-if ($csvImport->hasError()) {
+if ($csvImport->has_error()) {
     exit(1);
 }
 exit(0);
