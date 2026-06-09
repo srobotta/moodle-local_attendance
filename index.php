@@ -14,20 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 //
+
+/**
+ * Displays the import form to upload a csv file and assets.
+ *
+ * @package       local_attendance
+ * @copyright     2026 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once('../../config.php');
+require_login();
+$pageurl = new moodle_url('/local/attendance/index.php');
+$context = context_system::instance();
+require_capability('local/attendance:view', $context);
+
+global $OUTPUT, $USER, $PAGE, $CFG;
 
 use local_attendance\csv_import;
 use local_attendance\import_handler;
 use local_attendance\form\upload as upload_form;
 
-global $OUTPUT, $USER, $PAGE, $CFG;
-
-$pageUrl = new moodle_url('/local/attendance/index.php');
-$context = context_system::instance();
-require_capability('local/attendance:view', $context);
-
 $PAGE->set_context($context);
-$PAGE->set_url($pageUrl);
+$PAGE->set_url($pageurl);
 $PAGE->set_pagelayout('admin');
 
 if (!$course = get_site()) {
@@ -47,11 +56,11 @@ if ($mform->is_submitted() && $mform->is_validated()) {
     core_php_time_limit::raise();
     raise_memory_limit(MEMORY_HUGE);
 
-    $importHandler = new import_handler((object)[
+    $handler = new import_handler((object)[
         'suffix' => $mform->get_course_suffix(),
         'files' => $mform->get_content_files(),
     ]);
-    $csvimport = new csv_import($importHandler, $mform);
+    $csvimport = new csv_import($handler, $mform);
     $csvimport->import_csv_file();
     $mform->cleanup_files();
     if (!$csvimport->has_error()) {
@@ -65,7 +74,7 @@ if ($mform->is_submitted() && $mform->is_validated()) {
         echo $logentry . "\n";
     }
     echo '</pre>';
-    echo $OUTPUT->single_button($pageUrl, get_string('back'), 'get');
+    echo $OUTPUT->single_button($pageurl, get_string('back'), 'get');
 } else {
     $mform->display();
 }

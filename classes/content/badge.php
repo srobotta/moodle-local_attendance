@@ -19,6 +19,7 @@ namespace local_attendance\content;
 use local_attendance\utils\utils;
 use local_attendance\modcreate;
 
+defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/badgeslib.php');
 
 /**
@@ -71,7 +72,7 @@ class badge extends modcreate {
             if ($criteriatype === -1) {
                 $a = [
                     'value' => $this->row['criteriatype'],
-                    'column' => 'criteriatype'
+                    'column' => 'criteriatype',
                 ];
                 throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
             }
@@ -85,7 +86,7 @@ class badge extends modcreate {
             // Use uploaded image file, use this function instead of badges_process_badge_image because
             // the image is deleted after processing. We might need it again when importing other badges
             // from the same CSV file.
-            require_once($CFG->libdir. '/gdlib.php');
+            require_once($CFG->libdir . '/gdlib.php');
             \process_new_icon($this->badge->get_context(), 'badges', 'badgeimage', $this->badge->id, $data['imagefile']);
         } else {
             // Create image based on given parameters.
@@ -97,9 +98,9 @@ class badge extends modcreate {
                 $data['height'] ?? badge_image::DEFAULT_HEIGHT,
                 $data['imagemode'] ?? badge_image::TEXT_CHECKMARK
             );
-            $imgFile = $CFG->tempdir . '/local_attendance_badge_' . time() . '.png';
-            $img->get_image_blob($imgFile);
-            \badges_process_badge_image($this->badge, $imgFile);
+            $imgfile = $CFG->tempdir . '/local_attendance_badge_' . time() . '.png';
+            $img->get_image_blob($imgfile);
+            \badges_process_badge_image($this->badge, $imgfile);
         }
 
         if ($criteriatype !== -1) {
@@ -149,8 +150,7 @@ class badge extends modcreate {
         if ($criteria instanceof \award_criteria_courseset) {
             $id = $criteria->add_courses([$this->course->id]);
             $criteria->id = $id;
-        }
-        else if ($criteria instanceof \award_criteria_course) {
+        } else if ($criteria instanceof \award_criteria_course) {
             $params['course_' . $this->course->id] = $this->course->id;
         }
         $criteria->save($params);
@@ -182,7 +182,7 @@ class badge extends modcreate {
         return $this->badge;
     }
 
-        /**
+    /**
      * Get the URL to the created module.
      * @return string
      */
@@ -190,7 +190,7 @@ class badge extends modcreate {
         return (new \moodle_url('/badges/overview.php', ['id' => $this->get_id()]))->out();
     }
 
-    /** 
+    /**
      * Get the display name of the created module.
      */
     public function get_name(): string {

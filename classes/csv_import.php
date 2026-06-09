@@ -27,24 +27,83 @@ use local_attendance\form\import_interface as form;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class csv_import {
-
+    /**
+     * Constant for delimiter comma.
+     * @var string
+     */
     public const DELIMITER_COMMA = ',';
+    /**
+     * Constant for delimiter semicolon.
+     * @var string
+     */
     public const DELIMITER_SEMICOLON = ';';
+    /**
+     * Constant for delimiter tabulator.
+     * @var string
+     */
     public const DELIMITER_TAB = "\t";
 
+    /**
+     * Command for course columns.
+     * @var string
+     */
     public const CMD_COURSE_COLUMNS = 'COURSE_COLUMNS';
+    /**
+     * Command for module columns.
+     * @var string
+     */
     public const CMD_MODULE_COLUMNS = 'MODULE_COLUMNS';
+    /**
+     * Command for badge columns.
+     * @var string
+     */
     public const CMD_BADGE_COLUMNS = 'BADGE_COLUMNS';
+    /**
+     * Command for course line.
+     * @var string
+     */
     public const CMD_COURSE = 'COURSE';
+    /**
+     * Command for module line.
+     * @var string
+     */
     public const CMD_MODULE = 'MODULE';
+    /**
+     * Command for badge line.
+     * @var string
+     */
     public const CMD_BADGE = 'BADGE';
+    /**
+     * Command for use course line.
+     * @var string
+     */
     public const CMD_USE_COURSE = 'USE_COURSE';
+    /**
+     * Pseudo command for skip line.
+     * @var string
+     */
     public const CMD_SKIP_LINE = 'SKIP_LINE';
 
+    /**
+     * Import handler class.
+     * @var import_handler
+     */
     private import_handler $handler;
+    /**
+     * Formular class.
+     * @var form
+     */
     private form $form;
+    /**
+     * Column mapping.
+     * @var array
+     */
     private array $columns;
 
+    /**
+     * Log lines.
+     * @var array
+     */
     private array $log;
 
     /**
@@ -100,7 +159,8 @@ class csv_import {
                 ), 1);
                 continue;
             }
-            if ($currentcmd === self::CMD_SKIP_LINE &&
+            if (
+                $currentcmd === self::CMD_SKIP_LINE &&
                 !\in_array($fields[0], [self::CMD_COURSE, self::CMD_USE_COURSE, self::CMD_COURSE_COLUMNS])
             ) {
                 // Skip processing subsequent module lines until next course/column definition.
@@ -150,7 +210,7 @@ class csv_import {
                         ['line' => $currentline, 'message' => $e->getMessage()]
                     ), 1);
                     // When a course error occurs, stop processing modules for this course.
-                    $currentCmd = self::CMD_SKIP_LINE;
+                    $currentcmd = self::CMD_SKIP_LINE;
                 }
                 continue;
             }
@@ -175,16 +235,16 @@ class csv_import {
                 try {
                     $module = $this->handler->create_module($datamapped);
                     $this->log(get_string(
-                            'csv_import_ok_module',
-                            'local_attendance',
-                            [
-                                'line' => $currentline,
-                                'modulename' => $module->get_entity_name(),
-                                'id' => $module->get_id(),
-                                'name' => $module->get_name(),
-                                'url' => $module->get_url(),
-                                'info' => $module->get_additional_data(),
-                            ]
+                        'csv_import_ok_module',
+                        'local_attendance',
+                        [
+                            'line' => $currentline,
+                            'modulename' => $module->get_entity_name(),
+                            'id' => $module->get_id(),
+                            'name' => $module->get_name(),
+                            'url' => $module->get_url(),
+                            'info' => $module->get_additional_data(),
+                        ]
                     ));
                 } catch (\Exception $e) {
                     $this->log(get_string(
@@ -215,15 +275,15 @@ class csv_import {
                 try {
                     $badge = $this->handler->create_badge($datamapped);
                     $this->log(get_string(
-                            'csv_import_ok_badge',
-                            'local_attendance',
-                            [
-                                'line' => $currentline,
-                                'id' => $badge->get_id(),
-                                'name' => $badge->get_name(),
-                                'url' => $badge->get_url(),
-                                'info' => $badge->get_additional_data(),
-                            ]
+                        'csv_import_ok_badge',
+                        'local_attendance',
+                        [
+                            'line' => $currentline,
+                            'id' => $badge->get_id(),
+                            'name' => $badge->get_name(),
+                            'url' => $badge->get_url(),
+                            'info' => $badge->get_additional_data(),
+                        ]
                     ));
                 } catch (\Exception $e) {
                     $this->log(get_string(
@@ -282,14 +342,14 @@ class csv_import {
     }
 
     /**
-     * Log a message with an optional level. 
+     * Log a message with an optional level.
      * @param string $message The message to log.
      * @param int|null $level The log level (optional).
      */
     protected function log(string $message, ?int $level = 0): void {
         $this->log[] = [
             'level' => $level,
-            'message' => $message
+            'message' => $message,
         ];
     }
 
@@ -303,11 +363,11 @@ class csv_import {
 
     /**
      * Get the log messages.
-     * @param bool $errorsOnly If true, only return error messages. Otherwise, return all messages.
+     * @param bool $errorsonly If true, only return error messages. Otherwise, return all messages.
      * @return array The log messages.
      */
-    public function get_log(bool $errorsOnly = false): array {
-        if ($errorsOnly) {
+    public function get_log(bool $errorsonly = false): array {
+        if ($errorsonly) {
             return \array_map(fn($entry) => $entry['message'], array_filter($this->log, fn($entry) => $entry['level'] > 0));
         }
         return \array_map(fn($entry) => $entry['message'], $this->log);

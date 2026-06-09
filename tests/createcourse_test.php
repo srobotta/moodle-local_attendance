@@ -61,7 +61,7 @@ final class createcourse_test extends \advanced_testcase {
             'visible' => 1,
             'format' => 'topics',
             'startdate' => 1735689600, // 2025-01-01
-            'enddate' => 1735776000,   // 2025-01-02
+            'enddate' => 1735776000, // 2025-01-02
             'initsections' => 1,
         ], [
             'createsections' => true,
@@ -83,6 +83,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with basic fields by source_course_id.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_source_course_id(): void {
         $csvrow = [
@@ -98,6 +99,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with source_course_short.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_source_course_short(): void {
         $csvrow = [
@@ -110,6 +112,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with source_course_url.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_source_course_url(): void {
         global $CFG;
@@ -124,6 +127,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with default fields inherited from source course.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_inherited_fields(): void {
         $csvrow = [
@@ -141,6 +145,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with custom visibility override.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_custom_visible(): void {
         $csvrow = [
@@ -153,6 +158,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with custom category override.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_custom_category(): void {
         $newcategory = $this->getDataGenerator()->create_category([
@@ -168,6 +174,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with custom format.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_custom_format(): void {
         $csvrow = [
@@ -180,6 +187,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with custom start and end dates.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_custom_dates(): void {
         $newstartdate = 1740134400; // 2025-02-21
@@ -196,6 +204,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with default suffix when shortname is not provided.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_default_shortname_suffix(): void {
         $options = new \stdClass();
@@ -209,6 +218,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with section names.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_section_names(): void {
         $csvrow = [
@@ -226,6 +236,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with a link back to source course.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_link_new_course(): void {
         global $DB;
@@ -236,7 +247,6 @@ final class createcourse_test extends \advanced_testcase {
         $newcourse = $this->run_csv_test($csvrow);
 
         // Check that a URL module was created in the source course linking to the new course.
-        $module = $DB->get_record('modules', ['name' => 'url']);
         $urlmodule = $DB->get_record('url', ['course' => $this->sourcecourse->id]);
         $this->assertNotNull($urlmodule);
         $this->assertStringContainsString((string)$newcourse->id, $urlmodule->externalurl);
@@ -244,6 +254,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with link to specific section.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_link_to_section(): void {
         global $DB;
@@ -255,7 +266,7 @@ final class createcourse_test extends \advanced_testcase {
             'link_new_course' => 'Attendance',
             'link_new_course_section' => 2,
         ];
-        $newcourse = $this->run_csv_test($csvrow);
+        $this->run_csv_test($csvrow);
 
         // Check that the URL module was created.
         $urlmodule = $DB->get_record('url', ['course' => $this->sourcecourse->id]);
@@ -264,6 +275,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with copy participants option.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_copy_participants(): void {
         // Enrol a user in the source course.
@@ -285,6 +297,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course without copy participants.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_without_copy_participants(): void {
         // Enrol a user in the source course.
@@ -305,6 +318,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with meta enrolment.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_meta_enrolment(): void {
         global $DB;
@@ -329,6 +343,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with grade completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_grade_completion_criteria(): void {
         $csvrow = [
@@ -350,6 +365,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with date completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_date_completion_criteria(): void {
         $completedate = '2027-12-31';
@@ -371,6 +387,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with duration completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_duration_completion_criteria(): void {
         $csvrow = [
@@ -389,6 +406,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with self completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_self_completion_criteria(): void {
         $csvrow = [
@@ -407,6 +425,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with unenrol completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_unenrol_completion_criteria(): void {
         $csvrow = [
@@ -425,6 +444,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test that multiple courses can be created from the same source course.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_multiple_courses_from_same_source(): void {
         $csvrow1 = [
@@ -448,6 +468,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with invalid source course ID throws exception.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_invalid_source_course_id(): void {
         $this->expectException(\moodle_exception::class);
@@ -459,6 +480,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with invalid source course short name throws exception.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_invalid_source_course_short(): void {
         $this->expectException(\moodle_exception::class);
@@ -470,6 +492,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course without any source course identifier throws exception.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_without_source_course_throws_exception(): void {
         $this->expectException(\moodle_exception::class);
@@ -481,6 +504,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test creating a course with combined completion criteria.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_with_combined_completion_criteria(): void {
         $csvrow = [
@@ -495,17 +519,18 @@ final class createcourse_test extends \advanced_testcase {
         $completion = new \completion_info($newcourse);
         $criteria = \array_values($completion->get_criteria());
         $this->assertEquals(2, count($criteria));
-        $this->assertEquals(2, $criteria[0]->criteriatype); // Date criterion
-        $this->assertEquals(6, $criteria[1]->criteriatype); // Grade criterion
+        $this->assertEquals(2, $criteria[0]->criteriatype); // Date criterion.
+        $this->assertEquals(6, $criteria[1]->criteriatype); // Grade criterion.
     }
 
     /**
      * Test that shortname suffix is used when shortname is not explicitly set.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_shortname_suffix_default(): void {
         $csvrow = [
             'source_course_id' => $this->sourcecourse->id,
-            // Do not set shortname
+            // Do not set shortname.
         ];
         $newcourse = $this->run_csv_test($csvrow);
 
@@ -516,6 +541,7 @@ final class createcourse_test extends \advanced_testcase {
 
     /**
      * Test course is created successfully with all major field types.
+     * @covers \local_attendance\import_handler::create_course()
      */
     public function test_create_course_comprehensive(): void {
         $newcategory = $this->getDataGenerator()->create_category([

@@ -85,7 +85,7 @@ final class createbadge_test extends \advanced_testcase {
      * @return content\badge The created badge object.
      */
     protected function run_badge_test(array $csvrow, ?\stdClass $options = null, int $usecourseid = 0): content\badge {
-        $handler = new import_handler($options);    
+        $handler = new import_handler($options);
         if ($usecourseid === 0) {
             // First, create the course where the badge will be created.
             $coursecsvdata = [
@@ -128,6 +128,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with default name and description.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_defaults(): void {
         global $DB;
@@ -147,6 +148,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with custom name.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_custom_name(): void {
         global $DB;
@@ -162,6 +164,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with custom description.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_custom_description(): void {
         global $DB;
@@ -178,6 +181,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with manual criteria.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_manual_criteria(): void {
         global $DB;
@@ -194,6 +198,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with course criteria.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_course_criteria(): void {
         global $DB;
@@ -218,6 +223,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with activity criteria.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_activity_criteria(): void {
         global $DB;
@@ -235,6 +241,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with profile criteria.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_profile_criteria(): void {
         global $DB;
@@ -252,10 +259,11 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with int criteria type.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_int_criteria_type(): void {
         global $DB;
-        // BADGE_CRITERIA_TYPE_MANUAL = 2
+        // BADGE_CRITERIA_TYPE_MANUAL = 2.
         $csvrow = [
             'name' => 'Int Criteria Badge',
             'criteriatype' => 2,
@@ -268,6 +276,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with generated image (default parameters).
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_generated_image_default(): void {
         global $CFG, $DB;
@@ -292,6 +301,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with custom image caption.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_custom_image_caption(): void {
         global $DB;
@@ -309,6 +319,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with custom colors.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_custom_colors(): void {
         global $DB;
@@ -327,6 +338,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with custom image dimensions.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_custom_dimensions(): void {
         global $DB;
@@ -345,6 +357,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with TEXT_ONLY imagemode.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_text_only_mode(): void {
         global $DB;
@@ -362,6 +375,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with TEXT_CHECKMARK imagemode.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_checkmark_mode(): void {
         global $DB;
@@ -379,6 +393,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with TEXT_TTF imagemode.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_ttf_mode(): void {
         global $DB;
@@ -396,6 +411,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with int imagemode constant.
+     * @covers \local_attendance\content\badge_image::__construct()
      */
     public function test_create_badge_with_int_imagemode(): void {
         global $DB;
@@ -403,7 +419,7 @@ final class createbadge_test extends \advanced_testcase {
         $csvrow = [
             'name' => 'Int Mode Badge',
             'criteriatype' => 'BADGE_CRITERIA_TYPE_MANUAL',
-            'imagemode' => 1, // TEXT_CHECKMARK
+            'imagemode' => 1, // TEXT_CHECKMARK.
         ];
         $badgeobj = $this->run_badge_test($csvrow);
 
@@ -413,6 +429,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge without badgedisable (should be enabled by default).
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_enabled_by_default(): void {
         global $DB;
@@ -430,6 +447,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with badgedisable set.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_disabled(): void {
         global $DB;
@@ -447,6 +465,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test that badge object returns correct ID.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_badge_object_get_id(): void {
         $csvrow = [
@@ -461,6 +480,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test that badge object returns correct entity name.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_badge_object_get_entity_name(): void {
         $csvrow = [
@@ -474,6 +494,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with invalid criteria type throws exception.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_invalid_criteria_type(): void {
         $this->expectException(\moodle_exception::class);
@@ -487,12 +508,13 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with missing image file throws exception.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_badge_with_missing_image_file(): void {
         $this->expectException(\moodle_exception::class);
 
         $options = new \stdClass();
-        $options->files = []; // Empty files array
+        $options->files = []; // Empty files array.
 
         $csvrow = [
             'name' => 'Missing Image Badge',
@@ -504,6 +526,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating multiple badges in the same course.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_create_multiple_badges_in_same_course(): void {
         global $DB;
@@ -528,6 +551,8 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with image caption from source course.
+     * @covers \local_attendance\content\badge::create()
+     * @covers \local_attendance\content\badge_image::_construct()
      */
     public function test_create_badge_image_caption_from_source_course(): void {
         global $DB;
@@ -546,6 +571,8 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test creating a badge with all custom image parameters.
+     * @covers \local_attendance\content\badge::create()
+     * @covers \local_attendance\content\badge_image::_construct()
      */
     public function test_create_badge_with_all_image_parameters(): void {
         global $DB;
@@ -570,6 +597,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test badge is created as BADGE_TYPE_COURSE.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_badge_type_is_course(): void {
         global $DB;
@@ -586,6 +614,7 @@ final class createbadge_test extends \advanced_testcase {
 
     /**
      * Test badge is created in the correct course.
+     * @covers \local_attendance\content\badge::create()
      */
     public function test_badge_created_in_correct_course(): void {
         global $DB;

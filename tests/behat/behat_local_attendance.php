@@ -29,12 +29,15 @@ use Behat\Mink\Exception\ExpectationException;
  *
  * @package   local_attendance
  * @category  test
+ * @copyright 2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_attendance extends behat_repository_upload {
     /**
-     * Uploads a file to the specified filemanager leaving other fields in upload form default. The paths should be relative to moodle codebase.
+     * Uploads a file to the specified filemanager leaving other fields in upload form default.
+     * The paths should be relative to moodle codebase.
      *
+     * phpcs:ignore moodle.Files.LineLength.TooLong
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager and scroll$/
      * @throws DriverException
      * @throws ExpectationException Thrown by behat_base::find
@@ -64,14 +67,14 @@ class behat_local_attendance extends behat_repository_upload {
         // Ensure all the form is ready.
         $noformexception = new ExpectationException('The upload file form is not ready', $this->getSession());
         $form = $this->find(
-                'xpath',
-                "//div[contains(concat(' ', normalize-space(@class), ' '), ' container ')]" .
-                "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
-                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
-                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content ')]" .
-                "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
-                "/descendant::form",
-                $noformexception
+            'xpath',
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' container ')]" .
+            "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
+            "/descendant::form",
+            $noformexception
         );
         // Form elements to interact with.
         $file = $this->find_file('repo_upload_file');
@@ -96,7 +99,6 @@ class behat_local_attendance extends behat_repository_upload {
 
         // The action depends on the field type.
         foreach ($datahash as $locator => $value) {
-
             $field = behat_field_manager::get_form_field_from_label($locator, $this);
 
             // Delegates to the field class.
@@ -109,7 +111,6 @@ class behat_local_attendance extends behat_repository_upload {
 
         // We wait for all the JS to finish as it is performing an action.
         $this->getSession()->wait(self::get_timeout(), self::PAGE_READY_JS);
-
     }
 
     /**
@@ -124,22 +125,27 @@ class behat_local_attendance extends behat_repository_upload {
         $exception = new ExpectationException('No files can be added to the specified filemanager', $this->getSession());
 
         // We should deal with single-file and multiple-file filemanagers,
-        // catching the exception thrown by behat_base::find() in case is not multiple
+        // catching the exception thrown by behat_base::find() in case is not multiple.
         $this->execute('behat_general::i_click_on_in_the', [
             'div.fp-btn-add a, input.fp-btn-choose', 'css_element',
-            $filemanagernode, 'NodeElement'
+            $filemanagernode,
+            'NodeElement',
         ]);
 
         // Wait for the default repository (if any) to load. This checks that
         // the relevant div exists and that it does not include the loading image.
         $this->ensure_element_exists(
-                "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
-                "//div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content ')]" .
-                "[not(descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content-loading ')])]",
-                'xpath_element');
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content ')]" .
+            "[not(descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content-loading ')])]",
+            'xpath_element'
+        );
 
         // Getting the repository link and opening it.
-        $repoexception = new ExpectationException('The "' . $repositoryname . '" repository has not been found', $this->getSession());
+        $repoexception = new ExpectationException(
+            'The "' . $repositoryname . '" repository has not been found',
+            $this->getSession()
+        );
 
         // Avoid problems with both double and single quotes in the same string.
         $repositoryname = behat_context_helper::escape($repositoryname);
@@ -167,5 +173,4 @@ class behat_local_attendance extends behat_repository_upload {
             $this->js_trigger_click($repositorylink);
         }
     }
-
 }

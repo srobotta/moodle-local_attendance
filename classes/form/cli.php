@@ -57,7 +57,8 @@ class cli implements import_interface {
      * Constructor for CLI form. Initializes the form data based on the provided arguments.
      *
      * @param string $csvfile Path to the CSV file to import.
-     * @param array|null $contentfiles Array of content files to be used in the import, with key = filename and value = path to temporary file.
+     * @param array|null $contentfiles Array of content files to be used in the import,
+     *                   with key = filename and value = path to temporary file.
      * @param string|null $coursesuffix Optional course suffix to append to created courses.
      * @param string|null $delimiter Optional CSV delimiter to use for parsing the CSV file.
      */

@@ -30,6 +30,7 @@ use local_attendance\utils\utils;
 class modcreate implements modcreate_interface {
     /**
      * The course where the module will be created.
+     * @var \stdClass
      */
     protected \stdClass $course;
 
@@ -92,7 +93,7 @@ class modcreate implements modcreate_interface {
                 ->get_section_info_by_id($data['sectionid'], MUST_EXIST)
                 ->sectionnum;
             unset($data['sectionid']);
-        } elseif (\array_key_exists('section', $data)) {
+        } else if (\array_key_exists('section', $data)) {
             $sectionnum = (int)$data['section'];
             if ($sectionnum < 0) { // Just in case someone puts section 0 in the csv of the field is empty.
                 $sectionnum = 0;
@@ -164,7 +165,7 @@ class modcreate implements modcreate_interface {
         return (new \moodle_url('/mod/' . $this->get_entity_name() . '/view.php', ['id' => $this->get_cm_id()]))->out();
     }
 
-    /** 
+    /**
      * Get the display name of the created module.
      */
     public function get_name(): string {

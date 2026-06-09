@@ -15,24 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Data generator for local_attendance plugin.
+ * Data generator class for local_attendance plugin.
  *
  * @package     local_attendance
  * @category    test
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Data generator class for local_attendance plugin.
- *
- * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class local_attendance_generator extends component_generator_base {
-
     /**
      * Process the attendance course setup, which enrols users with specified enrolment methods.
      *

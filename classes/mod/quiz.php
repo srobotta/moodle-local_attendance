@@ -49,7 +49,7 @@ class quiz extends modcreate {
      * @param \stdClass $course
      * @return modcreate_interface
      */
-    public function use_course(\stdClass $course): modcreate_interface{
+    public function use_course(\stdClass $course): modcreate_interface {
         parent::use_course($course);
         $save = false;
         // When creating attendance quizzes, we require the course to be in topics format.
@@ -67,7 +67,7 @@ class quiz extends modcreate {
         }
         return $this;
     }
-    
+
     /**
      * Create a quiz for attendance in the course.
      * @param array $data
@@ -126,17 +126,17 @@ class quiz extends modcreate {
      * to make sure the completion criteria based on grade work correctly.
      */
     protected function assert_gradable(): void {
-        $gradeItem = \grade_item::fetch([
+        $gradeitem = \grade_item::fetch([
             'courseid' => $this->course->id,
             'itemtype' => 'mod',
             'itemmodule' => 'quiz',
-            'iteminstance' => $this->get_id()
+            'iteminstance' => $this->get_id(),
         ]);
-        $gradeCat = $gradeItem->get_parent_category();
-        if ($gradeCat && (int)$gradeCat->aggregation !== GRADE_AGGREGATE_SUM) {
-            $gradeCat->aggregation = GRADE_AGGREGATE_SUM;
-            $gradeCat->update();
-            $gradeCat->pre_regrade_final_grades();
+        $gradecat = $gradeitem->get_parent_category();
+        if ($gradecat && (int)$gradecat->aggregation !== GRADE_AGGREGATE_SUM) {
+            $gradecat->aggregation = GRADE_AGGREGATE_SUM;
+            $gradecat->update();
+            $gradecat->pre_regrade_final_grades();
         }
     }
 
@@ -147,7 +147,7 @@ class quiz extends modcreate {
     protected function add_question(): int {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-        require_once($CFG->libdir . '/questionlib.php'); 
+        require_once($CFG->libdir . '/questionlib.php');
         $quiz = $DB->get_record('quiz', ['id' => $this->cm->instance], '*', MUST_EXIST);
         $quizobj = new quiz_settings($quiz, $this->cm, $this->course);
         $quizobj->get_structure()->check_can_be_edited();
@@ -184,7 +184,7 @@ class quiz extends modcreate {
         // a yes and no option with yes being the correct answer. Some of the data can be set
         // from the CSV import.
         $questiondata = new \stdClass();
-        $questiondata->name = $this->row['local_attendance_quiz_questionname'] 
+        $questiondata->name = $this->row['local_attendance_quiz_questionname']
             ?? get_string('col_questionname', 'local_attendance');
         $questiondata->questiontext = $this->get_text_and_format(
             'local_attendance_quiz_questiontext',
@@ -240,7 +240,7 @@ class quiz extends modcreate {
      */
     protected function get_password(): string {
         // Simple generated passwords.
-        if (\in_array($this->passwordrule, ['lower', 'alpha' , 'alnum', 'all'])) {
+        if (\in_array($this->passwordrule, ['lower', 'alpha', 'alnum', 'all'])) {
             $length = 6;
             $charset = 'abcdefghijklmnopqrstuvwxyz';
             $password = '';
@@ -264,16 +264,16 @@ class quiz extends modcreate {
         }
         // Sanitize the rule to avoid path traversal.
         $rule = preg_replace('/[^a-z_]/', '', $this->passwordrule);
-        $ruleFile = __DIR__ . '/../../wordlist/' . $rule . '.csv';
+        $rulefile = __DIR__ . '/../../wordlist/' . $rule . '.csv';
         // Pick a random line from the wordlist file and use that as password.
-        if (file_exists($ruleFile)) {
-            $passwords = explode("\n", file_get_contents($ruleFile));
+        if (file_exists($rulefile)) {
+            $passwords = explode("\n", file_get_contents($rulefile));
             if (empty($passwords) || count($passwords) === 1) {
                 throw new \moodle_exception(
                     'ex_invalidpasswdrulecontent',
                     'local_attendance',
                     '',
-                    ['file' => basename($ruleFile)]
+                    ['file' => basename($rulefile)]
                 );
             }
             return trim($passwords[array_rand($passwords)]);
@@ -292,8 +292,8 @@ class quiz extends modcreate {
      * @return bool
      */
     protected function is_valid_generated_password(string $password): bool {
-        $notThese = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
-        foreach ($notThese as $pair) {
+        $notthese = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
+        foreach ($notthese as $pair) {
             if (str_contains($password, $pair)) {
                 return false;
             }
@@ -305,8 +305,7 @@ class quiz extends modcreate {
      * Return the used password for the quiz.
      * @return string
      */
-    public function get_additional_data(): string
-    {
+    public function get_additional_data(): string {
         return get_string('password') . '=' . $this->moduleinfo->password;
     }
 }

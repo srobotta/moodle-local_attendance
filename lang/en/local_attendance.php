@@ -23,51 +23,52 @@
  */
 
 $string['attendance:view'] = 'Access to Attendance Course Creator';
-$string['pluginname'] = 'Attendance Course Creator';
+$string['badge_defaultdescription'] = 'This badge is awarded for attending the course {$a}.';
+$string['badge_defaultname'] = 'Attendance Badge';
+
+$string['col_generalfeedback'] = 'Please answer yes if you attended the class.';
+$string['col_questionname'] = 'Attendance question';
+$string['col_questiontext'] = 'Did you attend the class?';
+
+$string['csv_import_badgecolmissing'] = 'Line {$a->line}: Badge columns must be defined first before using them.';
+$string['csv_import_coursecolmissing'] = 'Line {$a->line}: Course columns must be defined first before using them.';
+$string['csv_import_invalidcommand'] = 'Line {$a->line}: Invalid command {$a->cmd} in CSV file.';
+$string['csv_import_missingcolumn'] = 'Line {$a->line}: Missing required column "{$a->column}".';
+$string['csv_import_modulecolmissing'] = 'Line {$a->line}: Module columns must be defined first before using them.';
+$string['csv_import_needcoursefirst'] = 'Line {$a->line}: Course must be defined in COURSE or USE_COURSE before adding modules.';
+$string['csv_import_ok_badge'] = 'Line {$a->line}: Badge name: "{$a->name}", link: {$a->url}, additional info: {$a->info}';
+$string['csv_import_ok_course'] = 'Line {$a->line}: Course id: {$a->id}, name: "{$a->name}" link: {$a->url}, additional info: {$a->info}';
+$string['csv_import_ok_module'] = 'Line {$a->line}: Module {$a->modulename} {$a->id}, name: "{$a->name}", link: {$a->url}, additional info: {$a->info}';
+$string['csv_import_skipline'] = 'Line {$a->line}: skipped because of earlier error.';
+$string['csv_importexception'] = 'Line {$a->line}: An exception occurred: {$a->message}';
+
+$string['ex_filemissing'] = 'Referenced file "{$a}" not found among uploaded content files.';
+$string['ex_fileuploadfailed'] = 'Uploaded file could not be saved in temporary location.';
+$string['ex_invalidimplements'] = 'The module class "{$a}" does not implement the required interface.';
+$string['ex_invalidmoduleclass'] = 'Invalid module specified, could not instantiate class "{$a}".';
+$string['ex_invalidpasswdrule'] = 'Invalid rule "{$a->rule}" for password generation, csv file for wordlist not found.';
+$string['ex_invalidpasswdrulecontent'] = 'Invalid content in wordlist "{$a->file}" for password generation.';
+$string['ex_invalidvalue'] = 'Invalid value "{$a->value}" for column "{$a->column}".';
+$string['ex_metaenrolmentnotpossible'] = 'Course meta link enrolment is not possible because method is not available.';
+$string['ex_missingfield'] = 'Missing required field "{$a->field}".';
+$string['ex_modnamemempty'] = 'Module name is empty.';
+$string['ex_modulecreationfailed'] = 'Module creation failed.';
+$string['ex_nosourcecourse'] = 'No source course defined in course data.';
+
 $string['form_btn_import'] = 'Import';
-$string['form_label_uploadcsvfile'] = 'Upload CSV file';
-$string['form_label_csvdelimiter'] = 'CSV delimiter';
 $string['form_label_contentfiles'] = 'Additional content files';
 $string['form_label_contentfiles_help'] = 'You can upload additional files here that are referenced by it\'s name in the CSV file. The files might be used in content that is created in the course or activity.';
 $string['form_label_coursesuffix'] = 'Course generic suffix';
 $string['form_label_coursesuffix_help'] = 'This suffix is attached to the course name and in lower case letters to the course short name. Can be overridden in the import file.';
-$string['form_value_coursesuffix'] = 'Attendance';
+$string['form_label_csvdelimiter'] = 'CSV delimiter';
+$string['form_label_uploadcsvfile'] = 'Upload CSV file';
 $string['form_opt_csvdelimitercomma'] = 'Comma (,)';
 $string['form_opt_csvdelimitersemicolon'] = 'Semicolon (;)';
 $string['form_opt_csvdelimitertab'] = 'Tab (\t)';
-$string['importsuccess'] = 'Import successful';
+$string['form_value_coursesuffix'] = 'Attendance';
+
 $string['importfailed'] = 'Import completed with errors';
 $string['importlog'] = 'Import Log';
-
-$string['ex_fileuploadfailed'] = 'Uploaded file could not be saved in temporary location.';
-$string['ex_filemissing'] = 'Referenced file "{$a}" not found among uploaded content files.';
-$string['ex_invalidmoduleclass'] = 'Invalid module specified, could not instantiate class "{$a}".';
-$string['ex_invalidimplements'] = 'The module class "{$a}" does not implement the required interface.';
-$string['ex_modulecreationfailed'] = 'Module creation failed.';
-$string['ex_invalidvalue'] = 'Invalid value "{$a->value}" for column "{$a->column}".';
-$string['ex_invalidpasswdrule'] = 'Invalid rule "{$a->rule}" for password generation, csv file for wordlist not found.';
-$string['ex_invalidpasswdrulecontent'] = 'Invalid content in wordlist "{$a->file}" for password generation.';
-$string['ex_metaenrolmentnotpossible'] = 'Course meta link enrolment is not possible because method is not available.';
-$string['ex_missingfield'] = 'Missing required field "{$a->field}".';
-$string['ex_nosourcecourse'] = 'No source course defined in course data.';
-$string['ex_modnamemempty'] = 'Module name is empty.';
-
-$string['csv_importexception'] = 'Line {$a->line}: An exception occurred: {$a->message}';
-$string['csv_import_invalidcommand'] = 'Line {$a->line}: Invalid command {$a->cmd} in CSV file.';
-$string['csv_import_coursecolmissing'] = 'Line {$a->line}: Course columns must be defined first before using them.';
-$string['csv_import_modulecolmissing'] = 'Line {$a->line}: Module columns must be defined first before using them.';
-$string['csv_import_badgecolmissing'] = 'Line {$a->line}: Badge columns must be defined first before using them.';
-$string['csv_import_missingcolumn'] = 'Line {$a->line}: Missing required column "{$a->column}".';
-$string['csv_import_needcoursefirst'] = 'Line {$a->line}: Course must be defined in COURSE or USE_COURSE before adding modules.';
-$string['csv_import_skipline'] = 'Line {$a->line}: skipped because of earlier error.';
-$string['csv_import_ok_course'] = 'Line {$a->line}: Course id: {$a->id}, name: "{$a->name}" link: {$a->url}, additional info: {$a->info}';
-$string['csv_import_ok_module'] = 'Line {$a->line}: Module {$a->modulename} {$a->id}, name: "{$a->name}", link: {$a->url}, additional info: {$a->info}';
-$string['csv_import_ok_badge'] = 'Line {$a->line}: Badge name: "{$a->name}", link: {$a->url}, additional info: {$a->info}';
-
-$string['col_questionname'] = 'Attendance question';
-$string['col_questiontext'] = 'Did you attend the class?';
-$string['col_generalfeedback'] = 'Please answer yes if you attended the class.';
-
-$string['badge_defaultname'] = 'Attendance Badge';
-$string['badge_defaultdescription'] = 'This badge is awarded for attending the course {$a}.';
+$string['importsuccess'] = 'Import successful';
+$string['pluginname'] = 'Attendance Course Creator';
 $string['privacy:metadata'] = 'The Attendance course creator plugin does not store any personal data.';

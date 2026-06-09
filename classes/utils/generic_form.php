@@ -45,22 +45,22 @@ class generic_form {
     public function get_fields(): ?\stdClass {
         $fields = new \stdClass();
         $reflection = new \ReflectionClass($this->moodleform);
-        $htmlForm = $reflection->getProperty('_form');
-        $form = $htmlForm->getValue($this->moodleform);
+        $htmlform = $reflection->getProperty('_form');
+        $form = $htmlform->getValue($this->moodleform);
         foreach ($form->_elements as $element) {
-                $res = $this->get_name_and_value_from_element($element);
-                if ($res === null) {
-                    continue;
+            $res = $this->get_name_and_value_from_element($element);
+            if ($res === null) {
+                continue;
+            }
+            if ($res instanceof \stdClass) {
+                // For grouped elements, merge all fields.
+                foreach (\array_keys(get_object_vars($res)) as $subname) {
+                    $fields->{$subname} = $res->{$subname};
                 }
-                if ($res instanceof \stdClass) {
-                    // For grouped elements, merge all fields.
-                    foreach (\array_keys(get_object_vars($res)) as $subname) {
-                        $fields->{$subname} = $res->{$subname};
-                    }
-                    continue;
-                }
-                [$name, $value] = $res;
-                $fields->{$name} = $value;
+                continue;
+            }
+            [$name, $value] = $res;
+            $fields->{$name} = $value;
         }
         return $fields;
     }
@@ -95,8 +95,8 @@ class generic_form {
         if ($element instanceof \MoodleQuickForm_date_selector) {
             $values = $element->getValue();
             $value = strtotime(
-                    reset($values['year']) . '-' . reset($values['month']) . '-' . reset($values['day']) . ' 00:00:00'
-                ) ?: null;
+                reset($values['year']) . '-' . reset($values['month']) . '-' . reset($values['day']) . ' 00:00:00'
+            ) ?: null;
             if ($value === null) {
                 return null;
             }
@@ -125,16 +125,18 @@ class generic_form {
             $elements = $element->getElements();
             $fields = new \stdClass();
             foreach ($elements as $el) {
-                [$innerName, $innerValue] = $this->get_name_and_value_from_element($el);
-                if ($innerValue === null) {
+                [$innername, $innervalue] = $this->get_name_and_value_from_element($el);
+                if ($innervalue === null) {
                     continue;
                 }
-                $fields->{$innerName} = $innerValue;
+                $fields->{$innername} = $innervalue;
             }
             return $fields;
         }
-        if ($element instanceof \MoodleQuickForm_filemanager ||
-            $element instanceof \MoodleQuickForm_filepicker) {
+        if (
+            $element instanceof \MoodleQuickForm_filemanager ||
+            $element instanceof \MoodleQuickForm_filepicker
+        ) {
             // Skip file elements.
             return null;
         }

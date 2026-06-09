@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 declare(strict_types=1);
 
 namespace local_attendance\utils;
@@ -32,12 +33,12 @@ class path {
      * the preserved PWD environment variable if available.
      */
     protected static function get_original_cwd(): string {
-        // Prefer preserved PWD (if sudo -E was used)
+        // Prefer preserved PWD (if sudo -E was used).
         $pwd = getenv('PWD');
         if ($pwd && is_dir($pwd)) {
             return $pwd;
         }
-        // Fallback to actual working directory
+        // Fallback to actual working directory.
         return getcwd();
     }
 
@@ -53,7 +54,7 @@ class path {
 
         $home = getenv('HOME');
 
-        // If running under sudo, try original user
+        // If running under sudo, try original user.
         if (!$home && isset($_SERVER['SUDO_USER'])) {
             $info = posix_getpwnam($_SERVER['SUDO_USER']);
             if ($info && isset($info['dir'])) {
@@ -61,7 +62,7 @@ class path {
             }
         }
         if (!$home) {
-            return $path; // fallback: leave unchanged
+            return $path; // Fallback: leave unchanged.
         }
         return $home . substr($path, 1);
     }
@@ -100,7 +101,7 @@ class path {
             return $input;
         }
 
-        // Step 1: expand ~
+        // Step 1: expand ~.
         $input = self::expand_tilde($input);
 
         // Step 2: absolute path?
@@ -111,16 +112,16 @@ class path {
             $path = $cwd . DIRECTORY_SEPARATOR . $input;
         }
 
-        // Step 3: normalize (handles .. and .)
+        // Step 3: normalize (handles .. and .).
         $path = self::normalize_path($path);
 
-        // Step 4: resolve real path if it exists
+        // Step 4: resolve real path if it exists.
         $real = realpath($path);
         if ($real !== false) {
             return $real;
         }
 
-        // Step 5: fallback (non-existent file)
+        // Step 5: fallback (non-existent file).
         return $path;
     }
 }

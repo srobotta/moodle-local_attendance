@@ -19,6 +19,8 @@ namespace local_attendance;
 use local_attendance\content\badge;
 use local_attendance\utils\utils;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/edit_form.php');
 
@@ -94,7 +96,7 @@ class import_handler {
             }
             $a = [
                 'value' => $data['source_course_url'],
-                'column' => 'source_course_url'
+                'column' => 'source_course_url',
             ];
             throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
         }
@@ -126,7 +128,7 @@ class import_handler {
         $fieldsfromsource = ['category', 'visible', 'format', 'startdate', 'enddate'];
         foreach ($fieldsfromsource as $field) {
             if (!\array_key_exists($field, $newdata)) {
-                $newdata[$field] = $this->course->$field;;
+                $newdata[$field] = $this->course->$field;
             }
         }
         // Remove numsections if present to use default, otherwise there could be conflicts.
@@ -146,7 +148,7 @@ class import_handler {
 
         // Link the new course in the source course by adding a URL module in the old course.
         if (\array_key_exists('link_new_course', $newdata)) {
-            $modLink= [
+            $modlink = [
                 'module' => 'url',
                 'name' => $newdata['link_new_course'],
                 'externalurl' => $CFG->wwwroot . '/course/view.php?id=' . $newcourse->id,
@@ -154,14 +156,14 @@ class import_handler {
             ];
             unset($newdata['link_new_course']);
             if (\array_key_exists('link_new_course_section', $newdata)) {
-                $modLink['section'] = (int)$newdata['link_new_course_section'];
+                $modlink['section'] = (int)$newdata['link_new_course_section'];
                 unset($newdata['link_new_course_section']);
             }
             if (\array_key_exists('link_new_course_section_position', $newdata)) {
-                $modLink['section_pos'] = (int)$newdata['link_new_course_section_position'];
+                $modlink['section_pos'] = (int)$newdata['link_new_course_section_position'];
                 unset($newdata['link_new_course_section_position']);
             }
-            $this->create_module($modLink);
+            $this->create_module($modlink);
         }
 
         // Check whether to add meta enrolment.
@@ -208,7 +210,7 @@ class import_handler {
                     if ($sectionnum < 0) {
                         $a = [
                             'value' => $sectionparts[2],
-                            'column' => $key
+                            'column' => $key,
                         ];
                         throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
                     }
@@ -216,7 +218,7 @@ class import_handler {
                     if (trim($sectionname) === '') {
                         $a = [
                             'value' => $sectionname,
-                            'column' => $key
+                            'column' => $key,
                         ];
                         throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
                     }
@@ -262,17 +264,18 @@ class import_handler {
      * @return void
      */
     protected function add_course_completion(\stdClass $newcourse, array $newdata): void {
-        global $CFG;
+        // @codingStandardsIgnoreLine
+        global $CFG, $COMPLETION_CRITERIA_TYPES;
         // Classes must be loaded here.
-        require_once($CFG->libdir.'/completionlib.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_self.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_date.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_unenrol.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_activity.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_duration.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_grade.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_role.php');
-        require_once($CFG->dirroot.'/completion/criteria/completion_criteria_course.php');
+        require_once($CFG->libdir . '/completionlib.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_self.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_date.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_unenrol.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_activity.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_duration.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_grade.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_role.php');
+        require_once($CFG->dirroot . '/completion/criteria/completion_criteria_course.php');
 
         // Prepare data object for criteria.
         $data = [
@@ -283,7 +286,7 @@ class import_handler {
         $data['activity_aggregation'] = 0;
         if (\array_key_exists('completion_criteria_activity', $newdata)) {
             $activityids = \array_map('intval', explode(',', $newdata['completion_criteria_activity']));
-            if (!empty($activityIds)) {
+            if (!empty($activityids)) {
                 $data['criteria_activity'] = array_fill_keys($activityids, 1);
                 $data['activity_aggregation'] = utils::any_or_all('completion_criteria_activity_aggregation', $newdata);
             }
@@ -303,12 +306,12 @@ class import_handler {
                 $data['role_aggregation'] = utils::any_or_all('completion_criteria_role_aggregation', $newdata);
             }
         }
-        // Simple criteria value mapping
+        // Simple criteria value mapping.
         foreach (['date', 'duration', 'grade'] as $criterion) {
             $keycriterion = 'completion_criteria_' . $criterion;
             if (\array_key_exists($keycriterion, $newdata)) {
                 $data['criteria_' . $criterion] = 1;
-                $keyvalue = 'criteria_' . $criterion . '_' . ($criterion === 'duration' ? 'days' :'value');
+                $keyvalue = 'criteria_' . $criterion . '_' . ($criterion === 'duration' ? 'days' : 'value');
                 $data[$keyvalue] = $criterion === 'date'
                     ? utils::parse_datetime($keycriterion, $newdata)
                     : $newdata[$keycriterion];
@@ -326,9 +329,9 @@ class import_handler {
         $completion->clear_criteria(false);
 
         // Loop through each criteria type and run its update_config() method.
-        global $COMPLETION_CRITERIA_TYPES;
+        // @codingStandardsIgnoreLine
         foreach ($COMPLETION_CRITERIA_TYPES as $type) {
-            $class = '\\completion_criteria_'.$type;
+            $class = '\\completion_criteria_' . $type;
             $criterion = new $class();
             $criterion->update_config($data);
         }
@@ -336,7 +339,7 @@ class import_handler {
         // Handle overall aggregation.
         $aggdata = [
             'course' => $data->id,
-            'criteriatype' => null
+            'criteriatype' => null,
         ];
         $aggregation = new \completion_aggregation($aggdata);
         $aggregation->setMethod($data->overall_aggregation);
@@ -358,7 +361,7 @@ class import_handler {
         // Trigger an event for course module completion changed.
         $event = \core\event\course_completion_updated::create([
             'courseid' => $newcourse->id,
-            'context' => \context_course::instance($newcourse->id)
+            'context' => \context_course::instance($newcourse->id),
         ]);
         $event->trigger();
     }
@@ -373,7 +376,8 @@ class import_handler {
         // Which module to add, load the correct class.
         if (str_contains($data['module'], '_')) {
             $modnameparts = explode('_', $data['module']);
-            $modclassname = implode('_', \array_slice($modnameparts, 0, 2)) . '\\mod\\' . implode('\\', \array_slice($modnameparts, 2));
+            $modclassname = implode('_', \array_slice($modnameparts, 0, 2))
+                . '\\mod\\' . implode('\\', \array_slice($modnameparts, 2));
             try {
                 $modclass = new $modclassname();
             } catch (\Exception $e) {
@@ -415,7 +419,7 @@ class import_handler {
             $users = get_users_roles($contextfrom, $enrolledusers);
             foreach ($users as $userid => $roles) {
                 if (!\in_array($userid, $enrolledusers)) {
-                    continue; // skip not enrolled
+                    continue; // Skip not enrolled.
                 }
                 foreach ($roles as $role) {
                     $enrolplugin->enrol_user($enrol, $userid, $role->roleid);

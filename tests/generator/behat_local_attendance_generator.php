@@ -22,17 +22,7 @@
  * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Behat data generator for local_attendance.
- *
- * @copyright   2025 Stephan Robotta <stephan.robotta@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class behat_local_attendance_generator extends behat_generator_base {
-
     /**
      * Get the list of creatable entities for attendance.
      *

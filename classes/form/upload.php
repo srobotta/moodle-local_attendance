@@ -17,8 +17,9 @@
 namespace local_attendance\form;
 
 use local_attendance\csv_import;
-require_once($CFG->libdir . '/formslib.php');
 
+defined('MOODLE_INTERNAL') || die();
+require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Form for uploading CSV file for attendance course creation
@@ -46,8 +47,13 @@ class upload extends \moodleform implements import_interface {
     protected function definition(): void {
         $mform = $this->_form;
 
-        $mform->addElement('filepicker', 'csvfile', get_string('form_label_uploadcsvfile', 'local_attendance'),
-            null, ['accepted_types' => ['.csv']]);
+        $mform->addElement(
+            'filepicker',
+            'csvfile',
+            get_string('form_label_uploadcsvfile', 'local_attendance'),
+            null,
+            ['accepted_types' => ['.csv']]
+        );
         $mform->addRule('csvfile', null, 'required', null, 'client');
         $mform->addElement('select', 'delimiter', get_string('form_label_csvdelimiter', 'local_attendance'), [
             csv_import::DELIMITER_COMMA => get_string('form_opt_csvdelimitercomma', 'local_attendance'),
@@ -149,7 +155,7 @@ class upload extends \moodleform implements import_interface {
      * Cleanup temporary files created during upload.
      * @return void
      */
-    public function cleanup_Files(): void {
+    public function cleanup_files(): void {
         if (!is_null($this->csvfile)) {
             @unlink($this->csvfile);
             $this->csvfile = null;

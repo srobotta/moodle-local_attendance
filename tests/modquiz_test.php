@@ -88,6 +88,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test creating course with very basic fields.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_create_quiz1(): void {
         $csvrow = [
@@ -107,6 +108,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test creating course with custom password rule and HTML in question text fields.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_create_quiz2(): void {
         $csvrow = [
@@ -130,12 +132,13 @@ final class modquiz_test extends \advanced_testcase {
         $question = reset($questions);
         $this->assertEquals('Attendance', $question->name);
         $this->assertEquals('<p class="alert alert-info">I was present</p>', $question->questiontext);
-        $this->assertEquals(1, $question->questiontextformat); // FORMAT_HTML
+        $this->assertEquals(1, $question->questiontextformat); // FORMAT_HTML.
         $this->assertEquals(1.0, $question->defaultmark);
     }
 
     /**
      * Test creating quiz with custom password via quizpassword field.
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_custom_password(): void {
         $csvrow = [
@@ -151,6 +154,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test creating quiz with empty quizpassword means no password.
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_no_password(): void {
         $csvrow = [
@@ -166,6 +170,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'lower' rule (only lowercase letters).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_lower(): void {
         $csvrow = [
@@ -182,6 +187,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'alpha' rule (lower and upper case letters).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_alpha(): void {
         $csvrow = [
@@ -198,6 +204,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'alnum' rule (letters and digits).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_alnum(): void {
         $csvrow = [
@@ -214,6 +221,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'all' rule (letters, digits and special chars).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_all(): void {
         $csvrow = [
@@ -225,12 +233,13 @@ final class modquiz_test extends \advanced_testcase {
         ];
         [$log, $quiz] = $this->run_csv_test($csvrow);
         $this->assertEquals(6, strlen($quiz->password));
-        // Check that password contains at least one special character or digit
+        // Check that password contains at least one special character or digit.
         $this->assertMatchesRegularExpression('/[!@#$%&*()_+\-={}[\]|:;<>,.?\/]*/', $quiz->password);
     }
 
     /**
      * Test password generation with 'en' wordlist (English nouns).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_en(): void {
         $csvrow = [
@@ -247,6 +256,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'de' wordlist (German nouns).
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_de(): void {
         $csvrow = [
@@ -263,6 +273,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'color' wordlist.
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_color(): void {
         $csvrow = [
@@ -279,6 +290,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test password generation with 'capital' wordlist.
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_create_quiz_password_rule_capital(): void {
         $csvrow = [
@@ -295,6 +307,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test custom answer options for yes and no.
+     * @covers \local_attendance\mod\quiz::create_question()
      */
     public function test_create_quiz_custom_answers(): void {
         $csvrow = [
@@ -310,23 +323,24 @@ final class modquiz_test extends \advanced_testcase {
         $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
-        // Get the question options to check the answers
+        // Get the question options to check the answers.
         $this->assertEquals('multichoice', $question->qtype);
-        $this->assertEquals(1, $question->options->single); // single=1 for single choice.
+        $this->assertEquals(1, $question->options->single); // Property single=1 for single choice.
         $this->assertEquals('Did you attend the class?', $question->questiontext);
-        $this->assertEquals(2, $question->questiontextformat); // FORMAT_MOODLE
-        // Check the answers
+        $this->assertEquals(2, $question->questiontextformat); // FORMAT_MOODLE.
+        // Check the answers.
         $answers = \array_values($question->options->answers);
         $this->assertCount(2, $answers);
         $this->assertEquals('Yes, I was there', $answers[0]->answer);
         $this->assertEquals('No, I was absent', $answers[1]->answer);
-        $this->assertEquals(1, $answers[0]->fraction); // Yes is correct
-        $this->assertEquals(0, $answers[1]->fraction); // No is incorrect
-        $this->assertEquals(2, $answers[0]->answerformat); // FORMAT_MOODLE
+        $this->assertEquals(1, $answers[0]->fraction); // Yes is correct.
+        $this->assertEquals(0, $answers[1]->fraction); // No is incorrect.
+        $this->assertEquals(2, $answers[0]->answerformat); // FORMAT_MOODLE.
     }
 
     /**
      * Test custom feedback for yes and no answers.
+     * @covers \local_attendance\mod\quiz::create_question()
      */
     public function test_create_quiz_custom_feedback(): void {
         $csvrow = [
@@ -342,23 +356,24 @@ final class modquiz_test extends \advanced_testcase {
         $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
-        // Check general feedback
+        // Check general feedback.
         $this->assertEquals('This quiz is for attendance tracking.', $question->generalfeedback);
-        $this->assertEquals(2, $question->generalfeedbackformat); // FORMAT_MOODLE
-        // Check answer-specific feedback
+        $this->assertEquals(2, $question->generalfeedbackformat); // FORMAT_MOODLE.
+        // Check answer-specific feedback.
         $answers = array_values($question->options->answers);
         $this->assertCount(2, $answers);
         $this->assertEquals('Thank you for confirming!', $answers[0]->feedback);
         $this->assertEquals('Sorry you could <em>not</em> attend.', $answers[1]->feedback);
-        $this->assertEquals(2, $answers[0]->feedbackformat); // FORMAT_MOODLE
-        $this->assertEquals(1, $answers[1]->feedbackformat); // FORMAT_HTML
+        $this->assertEquals(2, $answers[0]->feedbackformat); // FORMAT_MOODLE.
+        $this->assertEquals(1, $answers[1]->feedbackformat); // FORMAT_HTML.
     }
 
     /**
      * Test placing quiz in a specific section by section number.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_create_quiz_in_section(): void {
-        // Create additional sections in the course
+        // Create additional sections in the course.
         $this->getDataGenerator()->create_course_section(['course' => $this->course->id, 'section' => 2]);
         $this->getDataGenerator()->create_course_section(['course' => $this->course->id, 'section' => 3]);
 
@@ -377,12 +392,13 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test placing quiz in a specific section by section id.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_create_quiz_in_section_by_id(): void {
-        // Create an additional section and get its id
+        // Create an additional section and get its id.
         $section2 = $this->getDataGenerator()->create_course_section([
             'course' => $this->course->id,
-            'section' => 2
+            'section' => 2,
         ]);
 
         $csvrow = [
@@ -405,9 +421,10 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test placing quiz at a selected section and a specific position within a section.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_create_quiz_at_section_and_position(): void {
-        // Create a quiz first in section 0 (default)
+        // Create a quiz first in section 0 (default).
         $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'First Quiz',
@@ -415,7 +432,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:30:00',
         ]);
 
-        // Create a quiz in section 1 (default position)
+        // Create a quiz in section 1 (default position).
         $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'Second Quiz',
@@ -424,7 +441,7 @@ final class modquiz_test extends \advanced_testcase {
             'timeclose' => '2026-01-06 10:40:00',
         ]);
 
-        // Create another quiz at position 1 (should be before the previous quiz)
+        // Create another quiz at position 1 (should be before the previous quiz).
         [$log, $quiz, $cm] = $this->run_csv_test([
             'module' => 'local_attendance_quiz',
             'name' => 'Third Quiz',
@@ -434,18 +451,18 @@ final class modquiz_test extends \advanced_testcase {
             'section_pos' => '1',
         ]);
 
-        // Get all modules in section 0
+        // Get all modules in section 0.
         $modinfo = get_fast_modinfo($this->course);
         $section0modules = $modinfo->get_sections()[0] ?? [];
         $this->assertCount(1, $section0modules);
-        // Get all modules in section 1
+        // Get all modules in section 1.
         $modinfo = get_fast_modinfo($this->course);
         $section1modules = $modinfo->get_sections()[1] ?? [];
         $this->assertCount(2, $section1modules);
-        // The second quiz should be at position 1 (first position)
+        // The second quiz should be at position 1 (first position).
         $this->assertEquals($cm->id, reset($section1modules));
 
-        // Create a fourth quiz in a new section
+        // Create a fourth quiz in a new section.
         $csvrow3 = [
             'module' => 'local_attendance_quiz',
             'name' => 'Fourth Quiz',
@@ -454,19 +471,20 @@ final class modquiz_test extends \advanced_testcase {
             'section' => '2',
         ];
         [$log, $quiz, $cm] = $this->run_csv_test($csvrow3);
-        // Fetch module info again to get updated section info
+        // Fetch module info again to get updated section info.
         $modinfo = get_fast_modinfo($this->course);
         $section2modules = $modinfo->get_sections()[2] ?? [];
         $this->assertCount(1, $section2modules);
-        // The fourth quiz should be at first position
+        // The fourth quiz should be at first position.
         $this->assertEquals($cm->id, reset($section2modules));
     }
 
     /**
      * Test that course format is automatically set to 'topics' when creating quiz.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_course_format_set_to_topics(): void {
-        // Create a course with a different format
+        // Create a course with a different format.
         $this->course = $this->getDataGenerator()->create_course([
             'shortname' => 'at-course2',
             'fullname' => 'Test At Course 2',
@@ -483,16 +501,17 @@ final class modquiz_test extends \advanced_testcase {
         $modquiz = new mod\quiz();
         $modquiz->use_course($this->course)->set_row($csvrow)->create($csvrow);
 
-        // Reload course and check format
+        // Reload course and check format.
         $this->course = get_course($this->course->id);
         $this->assertEquals('topics', $this->course->format);
     }
 
     /**
      * Test that completion tracking is automatically enabled when creating quiz.
+     * @covers \local_attendance\mod\quiz::create()
      */
     public function test_completion_tracking_enabled(): void {
-        // Create a course with completion disabled
+        // Create a course with completion disabled.
         $this->course = $this->getDataGenerator()->create_course([
             'shortname' => 'at-course3',
             'fullname' => 'Test At Course 3',
@@ -508,13 +527,14 @@ final class modquiz_test extends \advanced_testcase {
         $modquiz = new mod\quiz();
         $modquiz->use_course($this->course)->set_row($csvrow)->create($csvrow);
 
-        // Reload course and check completion
+        // Reload course and check completion.
         $this->course = get_course($this->course->id);
         $this->assertEquals(COMPLETION_ENABLED, $this->course->enablecompletion);
     }
 
     /**
      * Test that quiz has correct grade settings.
+     * @covers \local_attendance\mod\quiz::assert_gradable()
      */
     public function test_quiz_grade_settings(): void {
         $csvrow = [
@@ -530,6 +550,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test that question has correct defaultmark of 1.0.
+     * @covers \local_attendance\mod\quiz::assert_gradable()
      */
     public function test_question_defaultmark(): void {
         $csvrow = [
@@ -547,6 +568,7 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test that question uses default language strings when not specified.
+     * @covers \local_attendance\mod\quiz::create_question()
      */
     public function test_question_default_strings(): void {
         $csvrow = [
@@ -559,10 +581,10 @@ final class modquiz_test extends \advanced_testcase {
         $questions = $this->get_questions($quiz, $cm);
         $this->assertCount(1, $questions);
         $question = reset($questions);
-        // Check that question name and text are not empty (they should have default values)
+        // Check that question name and text are not empty (they should have default values).
         $this->assertNotEmpty($question->name);
         $this->assertNotEmpty($question->questiontext);
-        // Check that answers are 'Yes' and 'No' (default strings)
+        // Check that answers are 'Yes' and 'No' (default strings).
         $answers = array_values($question->options->answers);
         $this->assertCount(2, $answers);
         $this->assertEquals(get_string('yes'), $answers[0]->answer);
@@ -571,9 +593,10 @@ final class modquiz_test extends \advanced_testcase {
 
     /**
      * Test that password does not contain confusing character pairs.
+     * @covers \local_attendance\mod\quiz::get_password()
      */
     public function test_password_no_confusing_chars(): void {
-        // Run multiple times to ensure the validation works
+        // Run multiple times to ensure the validation works.
         for ($i = 0; $i < 10; $i++) {
             $csvrow = [
                 'module' => 'local_attendance_quiz',
@@ -583,9 +606,9 @@ final class modquiz_test extends \advanced_testcase {
                 'local_attendance_quiz_passwordrule' => 'alnum',
             ];
             [$log, $quiz] = $this->run_csv_test($csvrow);
-            // Check that password doesn't contain confusing pairs
-            $confusingPairs = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
-            foreach ($confusingPairs as $pair) {
+            // Check that password doesn't contain confusing pairs.
+            $confusing = ['0O', 'O0', 'Il', 'lI', '1I', 'I1', '1l', 'l1', '5S', 'S5', '2Z', 'Z2'];
+            foreach ($confusing as $pair) {
                 $this->assertStringNotContainsString($pair, $quiz->password);
             }
         }

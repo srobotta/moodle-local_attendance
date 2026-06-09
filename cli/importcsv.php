@@ -34,7 +34,7 @@ use local_attendance\import_handler;
 use local_attendance\utils\path;
 
 // Store here the CSV file to import.
-$csvFile = null;
+$csvfile = null;
 
 // Now get cli option.
 [$options, $files] = cli_get_params(
@@ -51,7 +51,7 @@ $csvFile = null;
 );
 
 if (!empty($files)) {
-    $csvFile = \array_shift($files);
+    $csvfile = \array_shift($files);
 }
 
 if ($options['help']) {
@@ -64,19 +64,20 @@ Options:
 -s, --suffix            Course suffix.
 
 Example:
-\$sudo -u www-data /usr/bin/php public/local/attendance/cli/importcsv.php -d=\; -s='-2026' /path/to/courses.csv /path/to/contentfile1.pdf
+\$sudo -u www-data /usr/bin/php public/local/attendance/cli/importcsv.php -d=\; -s='-2026' \
+  /path/to/courses.csv /path/to/contentfile1.pdf
 ";
 
     echo $help;
     die;
 }
 
-if (empty($csvFile)) {
+if (empty($csvfile)) {
     cli_error('CSV file is required. Use --help for usage information.');
 }
 
 // Map filenames of content files and csv file.
-$csvfile = path::resolve_path($csvFile);
+$csvfile = path::resolve_path($csvfile);
 $contentfiles = [];
 foreach ($files as $file) {
     $fname = basename($file);
@@ -93,23 +94,23 @@ $admin = get_admin();
 \core\session\manager::set_user($admin);
 
 $mform = new form($csvfile, $contentfiles, $options['suffix'] ?? null, $options['del'] ?? null);
-$importHandler = new import_handler((object)[
+$handler = new import_handler((object)[
     'suffix' => $mform->get_course_suffix(),
     'files' => $mform->get_content_files(),
 ]);
-$csvImport = new csv_import($importHandler, $mform);
-$csvImport->import_csv_file();
+$import = new csv_import($handler, $mform);
+$import->import_csv_file();
 $mform->cleanup_files();
-if (!$csvImport->has_error()) {
+if (!$import->has_error()) {
     echo get_string('importsuccess', 'local_attendance');
 } else {
     echo get_string('importfailed', 'local_attendance');
 }
 echo PHP_EOL;
-foreach ($csvImport->get_log() as $logentry) {
+foreach ($import->get_log() as $logentry) {
     echo $logentry . PHP_EOL;
 }
-if ($csvImport->has_error()) {
+if ($import->has_error()) {
     exit(1);
 }
 exit(0);

@@ -42,7 +42,6 @@ class utils {
             }
         }
         return ['text' => $input, 'format' => $format];
-
     }
 
     /**
@@ -57,7 +56,7 @@ class utils {
         $formdata = $genericform->get_fields();
         foreach ($data as $key => $value) {
             if (property_exists($formdata, $key)) {
-                $formdata->{$key} = $value;    
+                $formdata->{$key} = $value;
             }
         }
         return $formdata;
@@ -75,11 +74,11 @@ class utils {
             return COMPLETION_AGGREGATION_ALL;
         }
         $value = strtolower(trim((string)$data[$key]));
-        $validValues = ['all', 'any', (string)COMPLETION_AGGREGATION_ALL, (string)COMPLETION_AGGREGATION_ANY];
-        if (!in_array($value, $validValues)) {
+        $validvalues = ['all', 'any', (string)COMPLETION_AGGREGATION_ALL, (string)COMPLETION_AGGREGATION_ANY];
+        if (!in_array($value, $validvalues)) {
             $a = [
                 'value' => $data[$key],
-                'column' => $key
+                'column' => $key,
             ];
             throw new \moodle_exception('ex_invalidvalue', 'local_attendance', '', $a);
         }
@@ -97,13 +96,13 @@ class utils {
      * @throws \moodle_exception If the value cannot be parsed.
      */
     public static function parse_datetime(string $key, array $data): int {
-        $strVal = trim($data[$key]);
-        $intVal = (int)$data[$key];
-        if ((string)$intVal === $strVal) {
+        $strval = trim($data[$key]);
+        $intval = (int)$data[$key];
+        if ((string)$intval === $strval) {
             // Value is an integer timestamp.
-            return $intVal;
+            return $intval;
         }
-        $timestamp = strtotime($strVal);
+        $timestamp = strtotime($strval);
         if (!empty($timestamp)) {
             // We got a valid timestamp from the string.
             return $timestamp;
