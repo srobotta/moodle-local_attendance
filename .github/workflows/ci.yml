@@ -117,6 +117,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd
 
+      - name: Moodle Code Checker
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpcs --max-warnings 0
+
       - name: Moodle PHPDoc Checker
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpdoc --max-warnings 0
@@ -130,7 +134,7 @@ jobs:
         run: moodle-plugin-ci savepoints
 
       - name: PHPUnit tests
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpunit --fail-on-warning
 
       - name: Behat features
