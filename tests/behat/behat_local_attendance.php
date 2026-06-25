@@ -32,7 +32,9 @@ use Behat\Mink\Exception\ExpectationException;
  * @copyright 2025 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class behat_local_attendance extends behat_repository_upload {
+class behat_local_attendance extends behat_base {
+    use core_behat_file_helper;
+
     /**
      * Uploads a file to the specified filemanager leaving other fields in upload form default.
      * The paths should be relative to moodle codebase.

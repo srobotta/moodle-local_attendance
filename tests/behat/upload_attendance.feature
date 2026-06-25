@@ -34,7 +34,26 @@ Feature: Upload attendance courses from CSV
 
   @javascript
   Scenario: Upload a full featured attendance course with three attendance dates
-    Given I log in as "admin"
+    Given the site is running Moodle version 5.2 or higher
+    And I log in as "admin"
+    And I navigate to "Plugins > Local plugins > Attendance Course Creator" in site administration
+    When I upload "local/attendance/tests/fixtures/my-badge.png" file to "Additional content files" filemanager
+    And I set the field "Course generic suffix" to "Attending"
+    And I upload "local/attendance/tests/fixtures/full_featured.csv" file to "Upload CSV file" filemanager
+    And I press "Import"
+    Then I should see "Import successful"
+    And I should see "Line 5: Course id:"
+    And I should see "Test Course (Attending)"
+    And I should see "Attendance confirmation for 16.02.2027"
+    When I am on "Test Course (Attending)" course homepage
+    Then I should see "Attendance confirmation for 16.02.2027"
+    And I should see "Attendance confirmation for 18.02.2027"
+    And I should see "Attendance confirmation for 22.02.2027"
+
+  @javascript
+  Scenario: Upload a full featured attendance course with three attendance dates
+    Given the site is running Moodle version 5.1 or lower
+    And I log in as "admin"
     And I navigate to "Plugins > Local plugins > Attendance Course Creator" in site administration
     When I upload "local/attendance/tests/fixtures/my-badge.png" file to "Additional content files" filemanager
     And I set the field "Course generic suffix" to "Attending"
