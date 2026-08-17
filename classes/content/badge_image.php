@@ -179,7 +179,13 @@ class badge_image {
         $white = imagecolorallocate($this->image, 255, 255, 255);
 
         // Use a TTF font.
-        $fafont = $CFG->libdir . "/fonts/fa-solid-900.ttf";
+        $fafont = "{$CFG->libdir}/fonts/fa-solid-900.ttf";
+        if (!file_exists($fafont)) {
+            $fafont = "{$CFG->dirroot}/../lib/bundles/fontawesome/webfonts/fa-solid-900.ttf";
+        }
+        if (!file_exists($fafont)) {
+            throw new \moodle_exception('FontAwesome TTF font not found at ' . $fafont);
+        }
         $textfont = $CFG->libdir . "/default.ttf";
 
         // Font Awesome checkmark (Unicode).
