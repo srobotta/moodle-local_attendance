@@ -85,42 +85,13 @@ class modcreate implements modcreate_interface {
         unset($data['module']);
         // Include the course lib to have the course related functions available.
         require_once($CFG->dirroot . '/course/modlib.php');
-        // At which section in the course to add the module? Default is 0 (General).
-        // In the csv we start counting sections at 1, so we need to subtract 1.
-        $sectionnum = 0;
-        if (\array_key_exists('sectionid', $data)) {
-            $sectionnum = get_fast_modinfo($this->course)
-                ->get_section_info_by_id($data['sectionid'], MUST_EXIST)
-                ->sectionnum;
-            unset($data['sectionid']);
-        } else if (\array_key_exists('section', $data)) {
-            $sectionnum = (int)$data['section'];
-            if ($sectionnum < 0) { // Just in case someone puts section 0 in the csv of the field is empty.
-                $sectionnum = 0;
-            }
-            unset($data['section']);
-        }
-        if (\array_key_exists('section_pos', $data)) {
-            // Section position is also accepted.
-            $modules = \course_modinfo::get_array_of_activities($this->course);
-            $poscounter = 0;
-            foreach ($modules as $mod) {
-                if ($mod->section == $sectionnum) {
-                    $poscounter++;
-                    if ($poscounter >= $data['section_pos']) {
-                        $beforemodule = $mod->cm;
-                        break;
-                    }
-                }
-            }
-            unset($data['section_pos']);
-        }
-
+        // At which section and position do we have to insert the new module.
+        [$sectionnum, $beforemodule] = $this->get_insert_position($data);
         // Prepare the data for the new module.
         [$mod, $context, $cw, $cm, $modinfodata] = prepare_new_moduleinfo_data($this->course, $modname, $sectionnum);
         $modinfodata->add = $modname;
         $modinfodata->modulename = $modname;
-        if (isset($beforemodule)) {
+        if (!empty($beforemodule)) {
             $modinfodata->beforemod = $beforemodule;
         }
         // Prepare the form in order to get default values for the module, also validation can be done here.
@@ -144,6 +115,68 @@ class modcreate implements modcreate_interface {
         }
         $this->moduleinfo = add_moduleinfo($formdata, $this->course, $mform);
         return $this;
+    }
+
+    /**
+     * Get information from the csv where to insert the new module. It can be positioned
+     * by a sectionid, sectionnum (natural accending section number in course) or by
+     * a module (identified by cmid or url).
+     * The returned array contains [section position, optional course module object]
+     * @param array $data
+     * @return array
+     * @throws \moodle_exception
+     */
+    public function get_insert_position(array &$data): array {
+        // At which section in the course to add the module? Default is 0 (General).
+        // In the csv we start counting sections at 1, so we need to subtract 1.
+        $sectionnum = 0;
+        $sectionpos = null;
+        if (\array_key_exists('sectionid', $data)) {
+            $sectionnum = get_fast_modinfo($this->course)
+                ->get_section_info_by_id($data['sectionid'], MUST_EXIST)
+                ->sectionnum;
+            unset($data['sectionid']);
+        } else if (\array_key_exists('section', $data)) {
+            $sectionnum = (int)$data['section'];
+            if ($sectionnum < 0) { // Just in case someone puts section 0 in the csv or the field is empty.
+                $sectionnum = 0;
+            }
+            unset($data['section']);
+        } else if (\array_key_exists('beforemodule', $data) || \array_key_exists('aftermodule', $data)) {
+            $urlorcmid = \array_key_exists('beforemodule', $data) ? $data['beforemodule'] : $data['aftermodule'];
+            $info = utils::get_section_info($urlorcmid);
+            if (!$info || $info->course != $this->course->id) {
+                throw new \moodle_exception('ex_invalidcm', 'local_attendance');
+            }
+            $sectionnum = $info->section;
+            $sectionpos = $info->position;
+            if (\array_key_exists('aftermodule', $data)) {
+                unset($data['aftermodule']);
+                $sectionpos += 1;
+            } else {
+                unset($data['beforemodule']);
+            }
+        }
+        if (\array_key_exists('section_pos', $data)) {
+            $sectionpos = $data['section_pos'];
+            unset($data['section_pos']);
+        }
+        // In the CSV section_pos was set directly or derived from beforemodule or aftermodule.
+        if ($sectionpos !== null) {
+            // Section position is accepted to define a position within a section.
+            $modules = \course_modinfo::get_array_of_activities($this->course);
+            $poscounter = 0;
+            foreach ($modules as $mod) {
+                if ($mod->section == $sectionnum) {
+                    $poscounter++;
+                    if ($poscounter >= $sectionpos) {
+                        $beforemodule = $mod->cm;
+                        break;
+                    }
+                }
+            }
+        }
+        return [$sectionnum, $beforemodule ?? null];
     }
 
     /**

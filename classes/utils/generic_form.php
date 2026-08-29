@@ -85,7 +85,12 @@ class generic_form {
                 $name = 'intro';
             }
             if (\array_key_exists('text', $value) && $value['text'] === null) {
-                return null;
+                return (object)[
+                    $name => [
+                        'text' => '',
+                        'format' => 1,
+                    ],
+                ];
             }
             return (object)[
                 $name => $value['text'],

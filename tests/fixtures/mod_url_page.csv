@@ -1,0 +1,6 @@
+COURSE_COLUMNS;source_course_id
+MODULE_COLUMNS;module;name;aftermodule;externalurl;
+USE_COURSE;3
+MODULE;url;Padlet;http://localhost:8000/mod/scorm/view.php?id=18;https://padlet.com/
+MODULE_COLUMNS;module;name;beforemodule;page;
+MODULE;page;Demo Local Attendance;10;<p>This is a <b>demo text</b> that uses html.</p><p>There is much more in this plugin to discover.</p>

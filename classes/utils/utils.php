@@ -56,6 +56,10 @@ class utils {
         $formdata = $genericform->get_fields();
         foreach ($data as $key => $value) {
             if (property_exists($formdata, $key)) {
+                if (\is_array($formdata->{$key}) && \array_key_exists('text', $formdata->{$key})) {
+                    $formdata->{$key} = self::get_text_and_format($value);
+                    continue;
+                }
                 $formdata->{$key} = $value;
             }
         }
@@ -128,5 +132,68 @@ class utils {
         }
         $yes = strtolower(get_string('yes'));
         return \in_array(strtolower($data[$key]), ['1', 'true', 'y', 'x', $yes], true);
+    }
+
+    /**
+     * Get information about course section by it's url.
+     * The returned information is wrapped in an object and contains the
+     * properties:
+     *  - course: with the course id
+     *  - section: with the section number
+     *  - position: with the position within that section.
+     *
+     * @param string|int $url
+     * @return ?object
+     */
+    public static function get_section_info(string|int $url): ?object {
+        global $DB;
+
+        // 1. Get the course module ID (cmid) from the URL parameter or directly when numeric.
+        if (is_int($url)) {
+            $cmid = $url;
+        } else if (is_numeric($url)) {
+            $cmid = (int)$url;
+        } else {
+            $query = parse_url($url, PHP_URL_QUERY);
+            $cmid = 0;
+            foreach (explode('&', $query) as $tuple) {
+                $kv = explode('=', $tuple);
+                if ($kv[0] === 'id' && array_key_exists(1, $kv)) {
+                    $cmid = (int)$kv[1];
+                }
+            }
+        }
+        // A valid cmid must be greater than 0, e.g. a positive id in the database.
+        if (!($cmid > 0)) {
+            return null;
+        }
+
+        // 2. Fetch the course module record to get the Course ID
+        try {
+            $cmrecord = $DB->get_record('course_modules', ['id' => $cmid], 'course', MUST_EXIST);
+            $courseid = $cmrecord->course;
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        // 3. Load the course modinfo
+        $modinfo = get_fast_modinfo($courseid);
+
+        // 4. Retrieve the activity's module info object
+        $cm = $modinfo->get_cm($cmid);
+
+        // 5. Get the section details
+        $sectionnum = $cm->sectionnum; // The section number (e.g., Topic 1, Week 2, etc.)
+
+        // 6. Find the exact position within that section
+        $sectioninfo = $modinfo->get_section_info($sectionnum);
+        $sequence = explode(',', $sectioninfo->sequence);
+        $position = array_search($cmid, $sequence); // 0-indexed position inside the section
+
+        return (object)[
+            'course' => $courseid,
+            'section' => $sectionnum,
+            'position' => $position + 1,
+        ];
     }
 }

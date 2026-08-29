@@ -44,6 +44,7 @@ $string['csv_importexception'] = 'Line {$a->line}: An exception occurred: {$a->m
 
 $string['ex_filemissing'] = 'Referenced file "{$a}" not found among uploaded content files.';
 $string['ex_fileuploadfailed'] = 'Uploaded file could not be saved in temporary location.';
+$string['ex_invalidcm'] = 'Invalid course module defined where to insert item.';
 $string['ex_invalidimplements'] = 'The module class "{$a}" does not implement the required interface.';
 $string['ex_invalidmoduleclass'] = 'Invalid module specified, could not instantiate class "{$a}".';
 $string['ex_invalidpasswdrule'] = 'Invalid rule "{$a->rule}" for password generation, csv file for wordlist not found.';
