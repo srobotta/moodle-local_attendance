@@ -143,7 +143,7 @@ class modcreate implements modcreate_interface {
             }
             unset($data['section']);
         } else if (\array_key_exists('beforemodule', $data) || \array_key_exists('aftermodule', $data)) {
-            $urlorcmid = \array_key_exists('beforemodule', $data) ? $data['beforemodule'] : $data['aftermodule'];
+            $urlorcmid = \array_key_exists('aftermodule', $data) ? $data['aftermodule'] : $data['beforemodule'];
             $info = utils::get_section_info($urlorcmid);
             if (!$info || $info->course != $this->course->id) {
                 throw new \moodle_exception('ex_invalidcm', 'local_attendance');

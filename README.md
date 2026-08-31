@@ -217,10 +217,10 @@ to load a class `\frankenstyle_plugin\mod\someclass` which must implement the in
 * `sectionid` {int} section identified by id where to add the activity. If not set `section` is used.
 * `section_pos` {int} position where the new module is placed inside the given section. By default,
 the module is appended after the last existing module in that section.
-* `beforemodule` {string|int} the module url or course module id where to insert the new module prior
-to the existing module in the course.
 * `aftermodule` {string|int} the module url or course module id where to insert the new module after
 the existing module in the course.
+* `beforemodule` {string|int} the module url or course module id where to insert the new module prior
+to the existing module in the course.
 * `name` {string} name of the activity.
 * `timeopen` {datetime} parsable date time string for the time when the activity opens.
 * `timeclose` {datetime} parsable date time string for the closing time when the activity finishes.
@@ -231,6 +231,19 @@ to setup the activity. For a quiz this would be:
 * `quizpassword` {string} set a specific password to enter the quiz. If not set, a password
 is created automatically (see below). If set but empty, then no access password is used.
 * `timelimit` {int} the number of seconds how long the quiz might be answered, default is 60.
+
+A url activity needs the paramerer `externalurl` that contains the link that is placed in the course.
+
+The positioning of the new module takes this precedence:
+
+1. `section`
+1. `section_num`
+1. `aftermodule`
+1. `beforemodule`
+
+The parameter `section_pos` makes sense only when used with `section` or `section_num`. When a
+concrete module is given by `aftermodule` or `beforemodule` the position is automatically determined
+by the given module.
 
 ### Columns for attentance courses
 
