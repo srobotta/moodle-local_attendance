@@ -342,6 +342,109 @@ final class createcourse_test extends \advanced_testcase {
     }
 
     /**
+     * Test creating a course with self enrolment enabled.
+     * @covers \local_attendance\import_handler::create_course()
+     */
+    public function test_create_course_with_self_enrolment_enabled(): void {
+        global $DB;
+        // Enable self enrolment plugin if available.
+        enrol_is_enabled('self') || $this->markTestSkipped('Self enrolment plugin not enabled');
+
+        $csvrow = [
+            'source_course_id' => $this->sourcecourse->id,
+            'selfenrolment' => 1,
+        ];
+        $newcourse = $this->run_csv_test($csvrow);
+
+        // Check that self enrolment was added.
+        $enrolments = $DB->get_records('enrol', [
+            'courseid' => $newcourse->id,
+            'enrol' => 'self',
+        ]);
+        $this->assertNotEmpty($enrolments);
+        $enrol = reset($enrolments);
+        // 1 means disabled, 0 means enabled.
+        $this->assertEquals(0, $enrol->status);
+    }
+
+    /**
+     * Test creating a course with self enrolment disabled.
+     * @covers \local_attendance\import_handler::create_course()
+     */
+    public function test_create_course_with_self_enrolment_disabled(): void {
+        global $DB;
+        // Enable self enrolment plugin if available.
+        enrol_is_enabled('self') || $this->markTestSkipped('Self enrolment plugin not enabled');
+
+        $csvrow = [
+            'source_course_id' => $this->sourcecourse->id,
+            'selfenrolment' => 0,
+        ];
+        $newcourse = $this->run_csv_test($csvrow);
+
+        // Check that self enrolment was added.
+        $enrolments = $DB->get_records('enrol', [
+            'courseid' => $newcourse->id,
+            'enrol' => 'self',
+        ]);
+        $this->assertNotEmpty($enrolments);
+        $enrol = reset($enrolments);
+        // 1 means disabled, 0 means enabled.
+        $this->assertEquals(1, $enrol->status);
+    }
+
+    /**
+     * Test creating a course with self enrolment enabled.
+     * @covers \local_attendance\import_handler::create_course()
+     */
+    public function test_create_course_with_self_enrolment_enabled_and_default_disabled(): void {
+        global $DB;
+        // Enable self enrolment plugin if available.
+        enrol_is_enabled('self') || $this->markTestSkipped('Self enrolment plugin not enabled');
+        set_config('defaultenrol', 0, 'enrol_self'); // Self enrolment is not added to a new course by default.
+
+        $csvrow = [
+            'source_course_id' => $this->sourcecourse->id,
+            'selfenrolment' => 1,
+        ];
+        $newcourse = $this->run_csv_test($csvrow);
+
+        // Check that self enrolment was added.
+        $enrolments = $DB->get_records('enrol', [
+            'courseid' => $newcourse->id,
+            'enrol' => 'self',
+        ]);
+        $this->assertNotEmpty($enrolments);
+        $enrol = reset($enrolments);
+        // 1 means disabled, 0 means enabled.
+        $this->assertEquals(0, $enrol->status);
+    }
+
+    /**
+     * Test creating a course with self enrolment disabled.
+     * @covers \local_attendance\import_handler::create_course()
+     */
+    public function test_create_course_with_self_enrolment_disabled_and_default_disabled(): void {
+        global $DB;
+        // Enable self enrolment plugin if available.
+        enrol_is_enabled('self') || $this->markTestSkipped('Self enrolment plugin not enabled');
+        set_config('defaultenrol', 0, 'enrol_self'); // Self enrolment is not added to a new course by default.
+
+        $csvrow = [
+            'source_course_id' => $this->sourcecourse->id,
+            'selfenrolment' => 0,
+        ];
+        $newcourse = $this->run_csv_test($csvrow);
+
+        // Check that self enrolment was added.
+        $enrolments = $DB->get_records('enrol', [
+            'courseid' => $newcourse->id,
+            'enrol' => 'self',
+        ]);
+        $this->assertEmpty($enrolments);
+    }
+
+    /**
      * Test creating a course with grade completion criteria.
      * @covers \local_attendance\import_handler::create_course()
      */

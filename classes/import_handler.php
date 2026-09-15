@@ -166,13 +166,13 @@ class import_handler {
             $this->create_module($modlink);
         }
 
-        // Check whether to add meta enrolment.
-        if (utils::is_set_and_enabled('metaenrolment', $newdata)) {
-            $this->add_meta_enrolment($newcourse);
-        }
         // Check whether to copy participants.
         if (utils::is_set_and_enabled('copyparticipants', $newdata)) {
             $this->copy_course_participants($newcourse);
+        }
+        // Check whether to add meta enrolment.
+        if (utils::is_set_and_enabled('metaenrolment', $newdata)) {
+            $this->add_meta_enrolment($newcourse);
         }
         // Now delete the options if they had been set but maybe not enabled.
         if (\array_key_exists('metaenrolment', $newdata)) {
@@ -180,6 +180,11 @@ class import_handler {
         }
         if (\array_key_exists('copyparticipants', $newdata)) {
             unset($newdata['copyparticipants']);
+        }
+        // Self enrolment can be enabled or disabled, so we check for its presence and edit it accordingly.
+        if (\array_key_exists('selfenrolment', $newdata)) {
+            $this->edit_self_enrolment($newcourse, $newdata['selfenrolment']);
+            unset($newdata['selfenrolment']);
         }
         // Set course completions.
         foreach (\array_keys($newdata) as $key) {
@@ -433,23 +438,76 @@ class import_handler {
      * Add meta enrolment to the new course from the source course.
      * @param \stdClass $newcourse
      * @return void
+     * @deprecated since 2026-09-15, use edit_meta_enrolment() instead.
      */
     public function add_meta_enrolment(\stdClass $newcourse): void {
+        $this->edit_meta_enrolment($newcourse, '1');
+    }
+
+    /**
+     * Edit meta enrolment in the new course based on the given value.
+     * @param \stdClass $newcourse
+     * @param string $value
+     * @return void
+     * @throws \moodle_exception
+     */
+    public function edit_meta_enrolment(\stdClass $newcourse, string $value): void {
+        $enable = utils::is_set_and_enabled('metaenrolment', ['metaenrolment' => $value]);
+        $res = $this->edit_enrolment($newcourse, 'meta', $enable, ['customint1' => $this->course->id]);
+        if (!$res) {
+            throw new \moodle_exception('ex_metaenrolmentnotpossible', 'local_attendance');
+        }
+    }
+
+    /**
+     * Edit self enrolment in the new course based on the given value.
+     * @param \stdClass $newcourse
+     * @param string $value
+     * @return void
+     * @throws \moodle_exception
+     */
+    public function edit_self_enrolment(\stdClass $newcourse, string $value): void {
+        $enable = utils::is_set_and_enabled('selfenrolment', ['selfenrolment' => $value]);
+        $res = $this->edit_enrolment($newcourse, 'self', $enable);
+        if (!$res) {
+            throw new \moodle_exception('ex_selfenrolmentnotpossible', 'local_attendance');
+        }
+    }
+
+    /**
+     * Edit enrolment in the new course based on the given value.
+     * @param \stdClass $newcourse
+     * @param string $enrolname
+     * @param bool $enable
+     * @param array $options
+     * @return bool
+     */
+    protected function edit_enrolment(\stdClass $newcourse, string $enrolname, bool $enable, array $options = []): bool {
         $plugins = enrol_get_plugins(true);
         foreach ($plugins as $plugin) {
-            if ($plugin->get_name() === 'meta') {
-                $enrols = enrol_get_instances($newcourse->id, true);
+            if ($plugin->get_name() === $enrolname) {
+                $enrols = enrol_get_instances($newcourse->id, false);
                 foreach ($enrols as $enrol) {
-                    if ($enrol->enrol === 'meta') {
-                        // Meta enrolment already exists.
-                        return;
+                    if ($enrol->enrol === $enrolname) {
+                        // Enrolment already exists, enable or disable it.
+                        // This comparism looks weird but works because $enrol->status = 1 is disabled.
+                        if ((bool)$enrol->status === $enable) {
+                            $data = clone($enrol);
+                            $data->status = $enable ? ENROL_INSTANCE_ENABLED : ENROL_INSTANCE_DISABLED;
+                            $plugin->update_instance($enrol, $data);
+                        }
+                        return true;
                     }
                 }
-                $plugin->add_instance($newcourse, ['customint1' => $this->course->id]);
-                return;
+                // Enrolment does not exist, create it if enabled.
+                if ($enable) {
+                    $options = \array_merge($plugin->get_instance_defaults(), ['status' => ENROL_INSTANCE_ENABLED], $options);
+                    $plugin->add_instance($newcourse, $options);
+                }
+                return true;
             }
         }
-        throw new \moodle_exception('ex_metaenrolmentnotpossible', 'local_attendance');
+        return false;
     }
 
     /**

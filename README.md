@@ -120,7 +120,10 @@ the same as the source course.
 the same as the source course.
 * `metaenrolment` {0|1} when set, the "Course meta link" enrolment method is added to
 the course, and all participants from the source course will be autmatically synchronized
-with this course. Note, this setting has no effect when this enrolment method is not
+with this course. Note, this setting throws an error when this enrolment method is not
+enabled in your Moodle site.
+* `selfenrolment` {0|1} when set, the self enrolment is enabled or disabled depending
+on the given value. Note, this setting throws an error when this enrolment method is not
 enabled in your Moodle site.
 * `copyparticipants` {0|1} when set, the participants from the source course will be
 enroled manually in the new course.

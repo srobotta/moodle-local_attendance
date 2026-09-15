@@ -55,6 +55,7 @@ $string['ex_missingfield'] = 'Missing required field "{$a->field}".';
 $string['ex_modnamemempty'] = 'Module name is empty.';
 $string['ex_modulecreationfailed'] = 'Module creation failed.';
 $string['ex_nosourcecourse'] = 'No source course defined in course data.';
+$string['ex_selfenrolmentnotpossible'] = 'Self enrolment is not possible because method is not available.';
 
 $string['form_btn_import'] = 'Import';
 $string['form_label_contentfiles'] = 'Additional content files';
