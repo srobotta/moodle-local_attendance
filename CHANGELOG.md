@@ -1,5 +1,12 @@
 # Changelog moodle-local_attendance
 
+## 5.2-r4
+
+- Add new course column `selfenrolment` that allows to enable or disable the
+self enrolment in the attendance course. With meta enrolment set and the self
+enrolment enabled by default, with this setting, the self enrolment can be prevended
+in the attendance course.
+
 ## 5.2-r3
 
 - New parameters `aftermodule` and `beforemodule` for creating an activity
