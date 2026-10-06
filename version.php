@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026091500; // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2026100600; // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2025041400; // Requires this Moodle version.
 $plugin->component = 'local_attendance';
-$plugin->release = 'v5.2-r4';
-$plugin->supported = [500, 502];
+$plugin->release = 'v5.3-r1';
+$plugin->supported = [500, 503];
 $plugin->maturity = MATURITY_STABLE;

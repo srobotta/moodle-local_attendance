@@ -1,5 +1,12 @@
 # Changelog moodle-local_attendance
 
+## 5.3-r1
+
+- Add support for Moodle 5.3, add CI for this version.
+- Fix issue when file was uploaded with special chars that are in Windows or ISO
+encoding but not UTF-8.
+- Skip empty lines that only contain the CSV delimiter (happens on some Excel exports)
+
 ## 5.2-r4
 
 - Add new course column `selfenrolment` that allows to enable or disable the
