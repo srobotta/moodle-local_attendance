@@ -48,3 +48,20 @@ Feature: Upload attendance courses from CSV
     Then I should see "Attendance confirmation for 16.02.2027"
     And I should see "Attendance confirmation for 18.02.2027"
     And I should see "Attendance confirmation for 22.02.2027"
+
+  @javascript
+  Scenario: Upload a couse list with iso-8859 encoding and special chars that need to be converted into utf8.
+    Given I log in as "admin"
+    And I navigate to "Plugins > Local plugins > Attendance Course Creator" in site administration
+    When I upload "local/attendance/tests/fixtures/course_attendance_iso_enc.csv" file to "Upload CSV file" filemanager
+    And I set the field "Course generic suffix" to "Anwesenheit"
+    And I set the field "CSV delimiter" to "Semicolon (;)"
+    And I press "Import"
+    Then I should see "Import successful"
+    And I should see "Line 8: Course id:"
+    And I should see "Test Course (Anwesenheit)"
+    And I should see "Anwesenheitsnachweis 26.09.2026 vormittags"
+    And I should see "Anwesenheitsnachweis 16.10.2026 nachmittags"
+    And I should see "Anwesenheitsnachweis 12.11.2026 vormittags"
+    And I should see "Anwesenheitsnachweis 04.12.2026 nachmittags"
+    And I should see "Anwesenheitsbestätigung"

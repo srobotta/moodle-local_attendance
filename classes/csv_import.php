@@ -126,13 +126,10 @@ class csv_import {
      * @throws \Exception
      */
     public function import_csv_file(): void {
-        $filepath = $this->form->get_csv_file();
-        $handle = fopen($filepath, 'r');
-        if ($handle === false) {
-            throw new \Exception('Could not open file: ' . $filepath);
-        }
+        $content = $this->get_content_from_csvfile();
 
-        $currentline = 0;
+        // Because subsequent lines may depend on the previous line,
+        // we need to keep track of the current command and course.
         $currentcmd = null;
         $currentcourse = null;
 
@@ -140,15 +137,7 @@ class csv_import {
             $this->handler = new import_handler();
         }
 
-        while (($line = fgets($handle, 4096)) !== false) {
-            $currentline++;
-            $line = trim($line);
-            if ($line === '') {
-                continue; // Skip empty lines.
-            }
-            if (str_starts_with($line, '#')) {
-                continue; // Skip comment lines.
-            }
+        foreach ($content as $currentline => $line) {
             $fields = str_getcsv($line, $this->form->get_csv_delimiter(), '"', '\\');
 
             if (!$this->is_valid_command($fields[0])) {
@@ -294,7 +283,39 @@ class csv_import {
                 }
             }
         }
+    }
+
+    /**
+     * Get the content of the CSV file. Do a encoding check and convert to UTF-8 if necessary.
+     * @return array The file content as an array of lines, the key holds the line number.
+     */
+    protected function get_content_from_csvfile(): array {
+        $filepath = $this->form->get_csv_file();
+        $handle = fopen($filepath, 'r');
+        if ($handle === false) {
+            throw new \Exception('Could not open file: ' . $filepath);
+        }
+        $content = [];
+        $linenumber = 0;
+        while (($line = fgets($handle, 4096)) !== false) {
+            $linenumber++;
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) {
+                continue; // Skip empty lines and comment lines.
+            }
+            if (str_replace($this->form->get_csv_delimiter(), '', $line) === '') {
+                continue; // Skip lines that only contain delimiters, when Excel exports empty lines as ";;;".
+            }
+            foreach (['ISO-8859-1', 'Windows-1252'] as $encoding) {
+                if (mb_check_encoding($line, $encoding)) {
+                    $line = mb_convert_encoding($line, 'UTF-8', $encoding);
+                    break;
+                }
+            }
+            $content[$linenumber] = $line;
+        }
         fclose($handle);
+        return $content;
     }
 
     /**
